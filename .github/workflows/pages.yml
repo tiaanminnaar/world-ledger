@@ -7,6 +7,7 @@ on:
       - 'client/**'
       - 'ledger.json'
       - 'history/**'
+      - 'index.html'
   workflow_dispatch: {}
 
 permissions:
