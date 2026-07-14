@@ -2,7 +2,7 @@
   "_comment": "Hand-maintained editorial layer. No live feed exists for these per the tech spec (WGC gold demand, cross-bloc penalty, welfare scenarios, bloc cohesion/notes, dispatch). Merged last by the harvester so these values always win over anything scraped. Seeded from the existing dashboard's 2025-26 era -- update quarterly.",
   "as_of": "2026-Q2",
   "metrics": {
-    "dollar_share_gold_incl": { "value": 0.494, "as_of": "2026-Q1", "source": "editorial (pending IMF COFER + IFS pull)" },
+    "dollar_share_gold_incl": { "value": 0.494, "as_of": "2026-Q1", "source": "editorial fallback only -- live value now comes from IMF COFER pull, this is used solely if that fetch fails with no prior ledger to fall back to" },
     "cb_gold_tonnes_4q": { "value": 1043, "as_of": "2026-Q1", "source": "World Gold Council Gold Demand Trends (hand-entered)" },
     "total_official_gold_tonnes": { "value": 36000, "as_of": "2026-Q1", "source": "editorial estimate, global official holdings" },
     "cross_bloc_penalty": { "value": -0.118, "as_of": "2024", "source": "editorial (Fed/IMF/WTO fragmentation research)" }

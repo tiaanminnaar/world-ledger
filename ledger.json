@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-07-14T17:44:30Z",
+  "sealed_at": "2026-07-14T17:57:21Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -26,7 +26,7 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4069.2,
+      "value": 4066.3,
       "as_of": "2026-07-14",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
@@ -38,16 +38,16 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4709.8,
+      "gold": 4706.4,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.494,
+      "value": 0.4203,
       "as_of": "2026-Q1",
-      "source": "editorial (pending IMF COFER + IFS pull)",
-      "editorial": true
+      "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
+      "stale": false
     },
     "cb_gold_tonnes_4q": {
       "value": 1043,
@@ -60,6 +60,18 @@
       "as_of": "2024",
       "source": "editorial (Fed/IMF/WTO fragmentation research)",
       "editorial": true
+    },
+    "cofer_usd_share_of_allocated": {
+      "value": 0.5713,
+      "as_of": "2026-Q1",
+      "source": "IMF COFER (allocated reserves, USD share)",
+      "stale": false
+    },
+    "cofer_allocated_total_usd_bn": {
+      "value": 13104.9,
+      "as_of": "2026-Q1",
+      "source": "IMF COFER (allocated reserves, all currencies, nominal USD)",
+      "stale": false
     }
   },
   "blocs": {

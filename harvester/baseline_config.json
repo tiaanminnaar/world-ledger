@@ -2,7 +2,7 @@
   "_comment": "Normalisation baselines for the composite formulas in the tech spec. GPR baseline is computed live from the source spreadsheet's own 2000-2015 window (real, reproducible). The others have no live historical feed yet (COFER/TIC-official/WGC history are v2 work), so they are editorial estimates -- replace once those pulls exist.",
   "gpr_baseline_start": "2000-01",
   "gpr_baseline_end": "2015-12",
-  "dollar_share_gold_incl": { "min": 0.55, "max": 0.72, "editorial": true, "note": "replace with real IMF COFER 2000-2015 series once SDMX pull is wired (v2)" },
+  "dollar_share_gold_incl": { "min": 0.55, "max": 0.72, "editorial": true, "note": "current value now comes from live IMF COFER SDMX pull + live gold price; this min/max baseline window is still an editorial estimate -- replace with a real COFER 2000-2015 series pull to fully retire the editorial flag" },
   "treasuries_vs_gold_ratio": { "min": 0.6, "max": 1.35, "editorial": true, "note": "ratio = treasuries_usd_bn / gold_usd_bn; replace once historical TIC-official + gold series exist" },
   "cb_gold_purchases_trailing_4q_tonnes": { "min": 100, "max": 1100, "editorial": true, "note": "WGC has no API/history feed; editorial estimate" },
   "cross_bloc_penalty": { "min": -0.15, "max": 0.0, "editorial": true, "note": "no live feed exists per spec; editorial estimate" }

@@ -1,16 +1,28 @@
 #!/usr/bin/env python3
-"""World Ledger harvester -- Week 1 pipeline proof.
+"""World Ledger harvester.
 
-Pulls the three real-time-ish sources named in the spec (GPR spreadsheet,
-gold price, TIC foreign Treasury holdings), merges the editorial layer,
-computes the trust/tension composites, and writes ledger.json.
+Pulls the real-time-ish sources named in the spec (GPR spreadsheet, gold
+price, TIC foreign Treasury holdings, IMF COFER dollar share), merges the
+editorial layer, computes the trust/tension composites, and writes
+ledger.json.
 
 Run manually: python harvester/pipeline.py
-GitHub Actions cron + sanity-gate hardening is Week 2 work.
+Runs daily via GitHub Actions (.github/workflows/harvest.yml).
 
-COFER (dollar share), WGC gold demand history, and GDELT are not wired
-yet -- those metrics come from editorial.json for now and are flagged
-"editorial": true in the output, per the spec's harvestable/editorial split.
+WGC gold demand history and GDELT are not wired yet -- those metrics come
+from editorial.json for now and are flagged "editorial": true in the
+output, per the spec's harvestable/editorial split.
+
+COFER request shape (IMF SDMX 3.0, saved per the spec's "budget a full
+evening, save the exact request URL" advice -- dimension order is
+COUNTRY.INDICATOR.FXR_CURRENCY.TYPE_OF_TRANSFORMATION.FREQUENCY):
+  https://api.imf.org/external/sdmx/3.0/data/dataflow/IMF.STA/COFER/+/G001.AFXRA.CI_USD.SHRO_PT.Q
+    -> World allocated FX reserves, USD share of allocated, quarterly
+  https://api.imf.org/external/sdmx/3.0/data/dataflow/IMF.STA/COFER/+/G001.AFXRA.CI_T.NV_USD.Q
+    -> World allocated FX reserves, all currencies, nominal USD, quarterly
+COFER's "dollar share" excludes gold by definition (it's a reserves-composition
+series, not including monetary gold) -- the gold-inclusive figure the spec
+formula wants is derived here from these two series plus live gold price.
 """
 import json
 import re
@@ -31,6 +43,9 @@ BASELINE_PATH = HARVESTER_DIR / "baseline_config.json"
 GPR_URL = "https://www.matteoiacoviello.com/gpr_files/data_gpr_export.xls"
 GOLD_URL = "https://query1.finance.yahoo.com/v8/finance/chart/GC=F?range=5d&interval=1d"
 TIC_URL = "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Documents/mfh.txt"
+COFER_BASE = "https://api.imf.org/external/sdmx/3.0/data/dataflow/IMF.STA/COFER/+/G001.AFXRA"
+COFER_SHARE_URL = f"{COFER_BASE}.CI_USD.SHRO_PT.Q"
+COFER_TOTAL_URL = f"{COFER_BASE}.CI_T.NV_USD.Q"
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (world-ledger harvester; personal project)"}
 OZ_PER_TONNE = 32150.7466
@@ -39,7 +54,10 @@ MONTHS = {m: i for i, m in enumerate(
 
 # Sanity gate: reject a fetched value if it swings more than this vs. the
 # last published ledger, and fall back to the stale previous value instead.
-MAX_JUMP = {"gpr_index": 2.5, "gold_price_usd_oz": 0.15, "tic_foreign_holdings_usd_bn": 0.20}
+MAX_JUMP = {
+    "gpr_index": 2.5, "gold_price_usd_oz": 0.15, "tic_foreign_holdings_usd_bn": 0.20,
+    "cofer_usd_share_of_allocated": 0.15, "cofer_allocated_total_usd_bn": 0.15,
+}
 
 
 def load_previous_ledger():
@@ -152,6 +170,53 @@ def fetch_tic(prev_metrics):
         raise
 
 
+def _latest_cofer_obs(url):
+    """SDMX 3.0 JSON: observations are indexed by position into the shared
+    TIME_PERIOD value list, not keyed by period -- resolve the mapping."""
+    resp = requests.get(url, headers=HEADERS, timeout=30)
+    resp.raise_for_status()
+    payload = resp.json()["data"]
+    struct = payload["structures"][0]
+    periods = [v["value"] for v in struct["dimensions"]["observation"][0]["values"]]
+    series = next(iter(payload["dataSets"][0]["series"].values()))
+    obs = series["observations"]
+    last_idx = max(obs.keys(), key=int)
+    return float(obs[last_idx][0]), periods[int(last_idx)]
+
+
+def fetch_cofer(prev_metrics):
+    """IMF COFER: World allocated FX reserves, USD share + total nominal value.
+    Both series share the same quarterly cadence and as_of, so one failure
+    (e.g. schema drift on one series but not the other) still falls back
+    cleanly to the previous ledger's pair."""
+    try:
+        share, as_of_share = _latest_cofer_obs(COFER_SHARE_URL)
+        total_usd_bn, as_of_total = _latest_cofer_obs(COFER_TOTAL_URL)
+        if as_of_share != as_of_total:
+            raise ValueError(f"COFER series out of sync: share={as_of_share} total={as_of_total}")
+        share_frac = share / 100.0
+        total_usd_bn = total_usd_bn / 1e9
+
+        if not sanity_check("cofer_usd_share_of_allocated", share_frac, prev_metrics):
+            raise ValueError("failed sanity gate: cofer share")
+        if not sanity_check("cofer_allocated_total_usd_bn", total_usd_bn, prev_metrics):
+            raise ValueError("failed sanity gate: cofer total")
+
+        return {
+            "cofer_usd_share_of_allocated": {"value": round(share_frac, 4), "as_of": as_of_share,
+                                              "source": "IMF COFER (allocated reserves, USD share)", "stale": False},
+            "cofer_allocated_total_usd_bn": {"value": round(total_usd_bn, 1), "as_of": as_of_total,
+                                              "source": "IMF COFER (allocated reserves, all currencies, nominal USD)", "stale": False},
+        }
+    except Exception as e:
+        print(f"[warn] COFER fetch failed: {e}", file=sys.stderr)
+        if prev_metrics and "cofer_usd_share_of_allocated" in prev_metrics:
+            share_m = dict(prev_metrics["cofer_usd_share_of_allocated"]); share_m["stale"] = True
+            total_m = dict(prev_metrics["cofer_allocated_total_usd_bn"]); total_m["stale"] = True
+            return {"cofer_usd_share_of_allocated": share_m, "cofer_allocated_total_usd_bn": total_m}
+        return None  # no COFER ever fetched yet -- caller falls back to editorial
+
+
 def norm(x, lo, hi):
     if x is None:
         return None
@@ -178,6 +243,7 @@ def main():
     gpr = fetch_gpr(prev_metrics)
     gold = fetch_gold(prev_metrics)
     tic = fetch_tic(prev_metrics)
+    cofer = fetch_cofer(prev_metrics)
 
     gpr_baseline_min = gpr["gpr_baseline_min"] if gpr["gpr_baseline_min"] is not None else None
     gpr_baseline_max = gpr["gpr_baseline_max"] if gpr["gpr_baseline_max"] is not None else None
@@ -188,8 +254,25 @@ def main():
     treasuries_usd_bn = tic["value"]
     treasuries_vs_gold_ratio = treasuries_usd_bn / gold_usd_bn if gold_usd_bn else None
 
+    # dollar share, gold-inclusive: COFER gives allocated-FX-only dollar share
+    # and total (excludes monetary gold by definition) -- fold gold in here.
+    # Falls back to the editorial estimate if COFER couldn't be fetched at all.
+    if cofer is not None:
+        cofer_total = cofer["cofer_allocated_total_usd_bn"]["value"]
+        cofer_share = cofer["cofer_usd_share_of_allocated"]["value"]
+        dollar_reserves_usd_bn = cofer_total * cofer_share
+        dollar_share_gold_incl = {
+            "value": round(dollar_reserves_usd_bn / (cofer_total + gold_usd_bn), 4),
+            "as_of": cofer["cofer_usd_share_of_allocated"]["as_of"],
+            "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
+            "stale": cofer["cofer_usd_share_of_allocated"].get("stale", False),
+        }
+    else:
+        dollar_reserves_usd_bn = None
+        dollar_share_gold_incl = {**ed["dollar_share_gold_incl"], "editorial": True}
+
     # ---- trust ----
-    n_dollar = norm(ed["dollar_share_gold_incl"]["value"],
+    n_dollar = norm(dollar_share_gold_incl["value"],
                      baseline["dollar_share_gold_incl"]["min"], baseline["dollar_share_gold_incl"]["max"])
     n_ratio = norm(treasuries_vs_gold_ratio,
                     baseline["treasuries_vs_gold_ratio"]["min"], baseline["treasuries_vs_gold_ratio"]["max"])
@@ -230,9 +313,13 @@ def main():
             "tic_foreign_holdings_usd_bn": tic,
             "gold_vs_treasuries_usd_bn": {"gold": round(gold_usd_bn, 1), "treasuries": round(treasuries_usd_bn, 1),
                                            "as_of": tic["as_of"], "note": f"gold = editorial {total_gold_tonnes}t x live price"},
-            "dollar_share_gold_incl": {**ed["dollar_share_gold_incl"], "editorial": True},
+            "dollar_share_gold_incl": dollar_share_gold_incl,
             "cb_gold_tonnes_4q": {**ed["cb_gold_tonnes_4q"], "editorial": True},
             "cross_bloc_penalty": {**ed["cross_bloc_penalty"], "editorial": True},
+            **({
+                "cofer_usd_share_of_allocated": cofer["cofer_usd_share_of_allocated"],
+                "cofer_allocated_total_usd_bn": cofer["cofer_allocated_total_usd_bn"],
+            } if cofer is not None else {}),
         },
         "blocs": editorial["blocs"],
         "dispatch": editorial["dispatch"],
