@@ -1,0 +1,26 @@
+{
+  "_comment": "Hand-maintained editorial layer. No live feed exists for these per the tech spec (WGC gold demand, cross-bloc penalty, welfare scenarios, bloc cohesion/notes, dispatch). Merged last by the harvester so these values always win over anything scraped. Seeded from the existing dashboard's 2025-26 era -- update quarterly.",
+  "as_of": "2026-Q2",
+  "metrics": {
+    "dollar_share_gold_incl": { "value": 0.494, "as_of": "2026-Q1", "source": "editorial (pending IMF COFER + IFS pull)" },
+    "cb_gold_tonnes_4q": { "value": 1043, "as_of": "2026-Q1", "source": "World Gold Council Gold Demand Trends (hand-entered)" },
+    "total_official_gold_tonnes": { "value": 36000, "as_of": "2026-Q1", "source": "editorial estimate, global official holdings" },
+    "cross_bloc_penalty": { "value": -0.118, "as_of": "2024", "source": "editorial (Fed/IMF/WTO fragmentation research)" }
+  },
+  "blocs": {
+    "west": { "cohesion": 72, "note": "A wave of tariffs and investment restrictions — the deepest fragmentation in decades. Each wall creates winners who defend it." },
+    "east": { "cohesion": 78, "note": "Official gold holdings pass foreign-held Treasuries for the first time in generations. The single anchor drops below half." },
+    "nonaligned": { "cohesion": 70, "note": "Two-thirds of world trade now runs through value chains being actively reshaped. The middle is now the system's remaining shock absorber." }
+  },
+  "dispatch": "The storm arrives not as one blow but as a thousand small closures, each with its own constituency sworn to keep it shut. Gold in the vaults now outweighs the paper promises. Below half — for the first time, the city asks what holds the generator up.",
+  "scenarios": [
+    { "id": "managed", "nm": "Managed Equilibrium", "welfare": -0.019, "tension_bump": 0,
+      "desc": "The blocs settle into a cold but stable two-system world. Incomplete fragmentation costs -1.9% of world welfare — the intra/inter-bloc gap holds at its step-change rather than spiralling. The middle stays unclaimed, and keeps the two halves connected." },
+    { "id": "ratchet", "nm": "Ratchet Escalation", "welfare": -0.027, "tension_bump": 10,
+      "desc": "Restrictions create concentrated domestic winners, and winners defend walls. Each closure is politically impossible to unwind, so the ratchet only turns one way. The 2025-26 tariff wave reopens the gap and the system drifts toward the worst projections." },
+    { "id": "west", "nm": "Nonaligned to West", "welfare": -0.027, "tension_bump": 6,
+      "desc": "The middle picks the incumbent order. Modelled world welfare loss deepens to -2.7% — the shock absorber becomes a wall, and the East is boxed into a smaller, harder bloc with less to lose." },
+    { "id": "east", "nm": "Nonaligned to East", "welfare": -0.037, "tension_bump": 14,
+      "desc": "The middle tilts to the challenger. The costliest path modelled: -3.7% of world welfare. The incumbent financial system loses its periphery, and the two halves stop sharing anything worth protecting." }
+  ]
+}

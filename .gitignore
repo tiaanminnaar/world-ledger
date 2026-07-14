@@ -1,0 +1,3 @@
+__pycache__/
+*.pyc
+harvester/_gpr_cache.xls

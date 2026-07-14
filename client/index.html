@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The World Ledger — Fragmentation Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&family=Cormorant+Garamond:ital,wght@1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --void:#06090f;
+  --steel:#0d141f;
+  --steel-lit:#131c2a;
+  --frost:#a8d8e8;
+  --frost-bright:#d8f0f8;
+  --frost-dim:#4a6b7a;
+  --hairline:rgba(168,216,232,.16);
+  --heat:#e0a03d;
+  --ember:#c9552e;
+  --blood:#b23430;
+  --ok:#7ab88a;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--void);
+  color:var(--frost);
+  font-family:'IBM Plex Mono',monospace;
+  font-weight:300;
+  min-height:100vh;
+  overflow-x:hidden;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(168,216,232,.05), transparent),
+    radial-gradient(ellipse 60% 50% at 50% 110%, rgba(201,85,46,.04), transparent);
+}
+/* frost vignette that thickens with tension */
+#frost{
+  position:fixed;inset:0;pointer-events:none;z-index:50;
+  background:
+    radial-gradient(ellipse at 0% 0%, rgba(200,235,248,.28), transparent 30%),
+    radial-gradient(ellipse at 100% 0%, rgba(200,235,248,.28), transparent 30%),
+    radial-gradient(ellipse at 0% 100%, rgba(200,235,248,.28), transparent 32%),
+    radial-gradient(ellipse at 100% 100%, rgba(200,235,248,.28), transparent 32%),
+    radial-gradient(ellipse at 50% 50%, transparent 55%, rgba(190,228,244,.14) 100%);
+  opacity:.25;
+  transition:opacity 1.4s ease;
+  filter:blur(2px);
+}
+.wrap{max-width:1280px;margin:0 auto;padding:28px 24px 60px}
+
+/* ---------- header ---------- */
+header{
+  display:flex;justify-content:space-between;align-items:flex-end;
+  border-bottom:1px solid var(--hairline);
+  padding-bottom:16px;margin-bottom:26px;gap:16px;flex-wrap:wrap;
+}
+.masthead h1{
+  font-family:'Oswald',sans-serif;font-weight:500;
+  font-size:clamp(26px,4vw,40px);letter-spacing:.22em;
+  text-transform:uppercase;color:var(--frost-bright);
+  text-shadow:0 0 22px rgba(168,216,232,.35);
+}
+.masthead .sub{
+  font-size:11px;letter-spacing:.28em;text-transform:uppercase;
+  color:var(--frost-dim);margin-top:6px;
+}
+.datestamp{text-align:right;font-size:11px;letter-spacing:.14em;color:var(--frost-dim);line-height:1.7}
+.datestamp b{color:var(--heat);font-weight:500}
+
+/* ---------- panels ---------- */
+.panel{
+  background:linear-gradient(180deg,var(--steel-lit),var(--steel));
+  border:1px solid var(--hairline);
+  clip-path:polygon(14px 0,100% 0,100% calc(100% - 14px),calc(100% - 14px) 100%,0 100%,0 14px);
+  padding:18px 20px;position:relative;
+}
+.panel::before{
+  content:'';position:absolute;top:0;left:14px;right:0;height:1px;
+  background:linear-gradient(90deg,rgba(168,216,232,.4),transparent 60%);
+}
+.panel h2{
+  font-family:'Oswald',sans-serif;font-weight:400;font-size:12px;
+  letter-spacing:.3em;text-transform:uppercase;color:var(--frost-dim);
+  margin-bottom:14px;display:flex;align-items:center;gap:10px;
+}
+.panel h2::after{content:'';flex:1;height:1px;background:var(--hairline)}
+
+.grid{display:grid;grid-template-columns:300px 1fr 300px;gap:18px;margin-bottom:18px}
+@media(max-width:980px){.grid{grid-template-columns:1fr}}
+
+/* ---------- ledger stats ---------- */
+.stat{padding:10px 0;border-bottom:1px dashed rgba(168,216,232,.1)}
+.stat:last-child{border-bottom:none}
+.stat .label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--frost-dim);margin-bottom:4px}
+.stat .value{
+  font-family:'Oswald',sans-serif;font-weight:500;font-size:24px;
+  color:var(--frost-bright);letter-spacing:.04em;transition:color .6s;
+}
+.stat .value.hot{color:var(--heat)}
+.stat .value.cold{color:var(--ember)}
+.stat .note{font-size:10px;color:var(--frost-dim);margin-top:3px;line-height:1.5}
+
+/* ---------- center: dial + tension ---------- */
+.core{display:flex;flex-direction:column;align-items:center;gap:8px}
+.dial-title{
+  font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.34em;
+  text-transform:uppercase;color:var(--frost-dim);margin-top:4px;
+}
+#dial{width:min(340px,90%);filter:drop-shadow(0 0 18px rgba(168,216,232,.15))}
+.dial-readout{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:44px;
+  color:var(--frost-bright);letter-spacing:.05em;line-height:1;
+  text-shadow:0 0 24px rgba(168,216,232,.45);
+}
+.dial-caption{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--frost-dim)}
+
+.tension-wrap{width:100%;margin-top:22px}
+.tension-head{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.24em;text-transform:uppercase;margin-bottom:7px}
+.tension-head .t-label{color:var(--frost-dim)}
+.tension-head .t-state{font-weight:500;transition:color .6s}
+.tension-bar{
+  height:20px;background:#0a0f17;border:1px solid var(--hairline);
+  position:relative;
+  clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%);
+}
+.tension-fill{
+  height:100%;width:0%;
+  background:linear-gradient(90deg,#8a5a28,var(--heat) 55%,var(--ember) 80%,var(--blood));
+  transition:width 1.2s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 0 14px rgba(201,85,46,.5);
+}
+.tension-notches{position:absolute;inset:0;display:flex;pointer-events:none}
+.tension-notches span{flex:1;border-right:1px solid rgba(6,9,15,.85)}
+.tension-notches span:last-child{border-right:none}
+.tension-scale{display:flex;justify-content:space-between;font-size:9px;letter-spacing:.16em;color:var(--frost-dim);margin-top:5px;text-transform:uppercase}
+
+/* ---------- blocs ---------- */
+.bloc{padding:12px 0;border-bottom:1px dashed rgba(168,216,232,.1)}
+.bloc:last-child{border-bottom:none}
+.bloc-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px}
+.bloc-name{font-family:'Oswald',sans-serif;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--frost-bright)}
+.bloc-tag{font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--frost-dim)}
+.cohesion{height:8px;background:#0a0f17;border:1px solid var(--hairline);margin:6px 0 5px;clip-path:polygon(4px 0,100% 0,calc(100% - 4px) 100%,0 100%)}
+.cohesion i{display:block;height:100%;transition:width 1.2s ease;box-shadow:0 0 8px currentColor}
+.bloc-note{font-size:10px;color:var(--frost-dim);line-height:1.55}
+
+/* ---------- timeline ---------- */
+.timeline{margin-bottom:18px}
+.tl-track{display:flex;position:relative;margin-top:8px}
+.tl-track::before{content:'';position:absolute;top:9px;left:4%;right:4%;height:1px;background:var(--hairline)}
+.era{
+  flex:1;text-align:center;cursor:pointer;position:relative;padding-top:24px;
+  transition:opacity .3s;border:none;background:none;color:inherit;font-family:inherit;
+}
+.era .node{
+  position:absolute;top:3px;left:50%;transform:translateX(-50%);
+  width:13px;height:13px;background:var(--void);
+  border:1px solid var(--frost-dim);transform-origin:center;
+  transform:translateX(-50%) rotate(45deg);
+  transition:all .3s;
+}
+.era.active .node{background:var(--heat);border-color:var(--heat);box-shadow:0 0 12px rgba(224,160,61,.7)}
+.era .yr{font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:.1em;color:var(--frost-dim);transition:color .3s}
+.era .nm{font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--frost-dim);margin-top:2px;transition:color .3s}
+.era.active .yr{color:var(--frost-bright)}
+.era.active .nm{color:var(--heat)}
+.era:hover .yr{color:var(--frost)}
+.era:focus-visible{outline:1px solid var(--heat);outline-offset:2px}
+.era.live .node{border-color:var(--ok)}
+.era.live .nm{color:var(--ok)}
+.era.live.active .node{background:var(--ok);border-color:var(--ok);box-shadow:0 0 12px rgba(122,184,138,.7)}
+.era.live.active .nm{color:var(--ok)}
+
+/* ---------- dispatch ---------- */
+.dispatch{
+  font-family:'Cormorant Garamond',serif;font-style:italic;font-size:17px;
+  line-height:1.65;color:#cfe6ee;padding:4px 6px 0;
+  border-left:2px solid var(--heat);padding-left:16px;margin-top:4px;
+  min-height:84px;transition:opacity .4s;
+}
+.dispatch .sig{display:block;font-family:'IBM Plex Mono',monospace;font-style:normal;font-size:9px;letter-spacing:.22em;text-transform:uppercase;color:var(--frost-dim);margin-top:10px}
+
+/* ---------- scenarios ---------- */
+.bottom{display:grid;grid-template-columns:1fr 320px;gap:18px}
+@media(max-width:980px){.bottom{grid-template-columns:1fr}}
+.scenario-btns{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.sc-btn{
+  background:#0a0f17;border:1px solid var(--hairline);color:var(--frost-dim);
+  font-family:'Oswald',sans-serif;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  padding:12px 8px;cursor:pointer;transition:all .25s;
+  clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px);
+}
+.sc-btn:hover{color:var(--frost);border-color:var(--frost-dim)}
+.sc-btn.active{color:var(--void);background:var(--heat);border-color:var(--heat);font-weight:600;box-shadow:0 0 16px rgba(224,160,61,.4)}
+.sc-btn:focus-visible{outline:1px solid var(--heat);outline-offset:2px}
+.sc-desc{font-size:11px;line-height:1.7;color:var(--frost);min-height:66px}
+.sc-desc em{color:var(--heat);font-style:normal}
+
+.welfare{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center}
+.welfare .big{
+  font-family:'Oswald',sans-serif;font-weight:600;font-size:56px;line-height:1;
+  transition:color .6s;text-shadow:0 0 26px currentColor;
+}
+.welfare .lbl{font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--frost-dim);margin-top:8px;line-height:1.7}
+
+footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;font-size:9px;letter-spacing:.12em;color:var(--frost-dim);line-height:1.8;text-transform:uppercase}
+
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div id="frost"></div>
+<div class="wrap">
+
+<header>
+  <div class="masthead">
+    <h1>The World Ledger</h1>
+    <div class="sub">Fragmentation Watch · Trust &amp; Tension Registry</div>
+  </div>
+  <div class="datestamp">
+    <span id="sealedLabel">RECORD SEALED</span> · <b id="sealedDate">—</b><br>
+    <span id="feedState">LOADING LEDGER…</span><br>
+    OBSERVER STATION · NONALIGNED SOUTH
+  </div>
+</header>
+
+<!-- timeline -->
+<div class="panel timeline">
+  <h2>The Ledger of Winters — select an era</h2>
+  <div class="tl-track" id="tlTrack" role="tablist" aria-label="Era timeline"></div>
+</div>
+
+<!-- main grid -->
+<div class="grid">
+
+  <!-- financial ledger -->
+  <div class="panel">
+    <h2>Financial Ledger</h2>
+    <div class="stat">
+      <div class="label">Dollar share of reserves</div>
+      <div class="value" id="stDollar">—</div>
+      <div class="note">Gold-inclusive share of global official reserves</div>
+    </div>
+    <div class="stat">
+      <div class="label">Central-bank gold demand</div>
+      <div class="value hot" id="stGold">—</div>
+      <div class="note" id="stGoldNote">Annual official-sector purchases</div>
+    </div>
+    <div class="stat">
+      <div class="label">Gold vs US Treasuries</div>
+      <div class="value" id="stGvT">—</div>
+      <div class="note">Official gold holdings vs foreign official Treasury holdings</div>
+    </div>
+    <div class="stat">
+      <div class="label">Merchandise trade growth</div>
+      <div class="value" id="stTrade">—</div>
+      <div class="note" id="stTradeNote">Global, year on year</div>
+    </div>
+  </div>
+
+  <!-- core dial -->
+  <div class="panel core">
+    <div class="dial-title">Reserve Trust</div>
+    <svg id="dial" viewBox="0 0 300 190" aria-label="Reserve trust gauge">
+      <defs>
+        <linearGradient id="arcGrad" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0%" stop-color="#b23430"/>
+          <stop offset="45%" stop-color="#e0a03d"/>
+          <stop offset="100%" stop-color="#a8d8e8"/>
+        </linearGradient>
+      </defs>
+      <path d="M 30 165 A 120 120 0 0 1 270 165" fill="none" stroke="#0a0f17" stroke-width="16"/>
+      <path id="arcFill" d="M 30 165 A 120 120 0 0 1 270 165" fill="none" stroke="url(#arcGrad)" stroke-width="16"
+            stroke-dasharray="377" stroke-dashoffset="377" style="transition:stroke-dashoffset 1.4s cubic-bezier(.4,0,.2,1)"/>
+      <g id="ticks" stroke="#4a6b7a" stroke-width="1.5"></g>
+      <line id="needle" x1="150" y1="165" x2="150" y2="62" stroke="#d8f0f8" stroke-width="2.5"
+            style="transform-origin:150px 165px;transition:transform 1.4s cubic-bezier(.4,0,.2,1)"/>
+      <circle cx="150" cy="165" r="7" fill="#0d141f" stroke="#a8d8e8" stroke-width="1.5"/>
+    </svg>
+    <div class="dial-readout" id="trustNum">—</div>
+    <div class="dial-caption">Confidence in the single-anchor system</div>
+
+    <div class="tension-wrap">
+      <div class="tension-head">
+        <span class="t-label">Geopolitical Tension</span>
+        <span class="t-state" id="tState">—</span>
+      </div>
+      <div class="tension-bar">
+        <div class="tension-fill" id="tFill"></div>
+        <div class="tension-notches"><span></span><span></span><span></span><span></span></div>
+      </div>
+      <div class="tension-scale"><span>Calm</span><span>Strain</span><span>Fracture</span><span>Rupture</span></div>
+    </div>
+  </div>
+
+  <!-- blocs -->
+  <div class="panel">
+    <h2>The Factions</h2>
+    <div class="bloc">
+      <div class="bloc-head"><span class="bloc-name">Western Bloc</span><span class="bloc-tag">Incumbent order</span></div>
+      <div class="cohesion"><i id="cWest" style="background:#a8d8e8;color:#a8d8e8;width:0%"></i></div>
+      <div class="bloc-note" id="nWest">—</div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-head"><span class="bloc-name">Eastern Bloc</span><span class="bloc-tag">Challenger order</span></div>
+      <div class="cohesion"><i id="cEast" style="background:#c9552e;color:#c9552e;width:0%"></i></div>
+      <div class="bloc-note" id="nEast">—</div>
+    </div>
+    <div class="bloc">
+      <div class="bloc-head"><span class="bloc-name">The Nonaligned</span><span class="bloc-tag">Shock absorbers</span></div>
+      <div class="cohesion"><i id="cNon" style="background:#e0a03d;color:#e0a03d;width:0%"></i></div>
+      <div class="bloc-note" id="nNon">—</div>
+    </div>
+    <div class="stat" style="margin-top:8px">
+      <div class="label">Cross-bloc trade penalty</div>
+      <div class="value cold" id="stPenalty">—</div>
+      <div class="note">Flows between blocs vs within blocs</div>
+    </div>
+  </div>
+</div>
+
+<!-- dispatch + scenarios -->
+<div class="bottom">
+  <div class="panel">
+    <h2>Steward's Dispatch</h2>
+    <div class="dispatch" id="dispatch"></div>
+    <h2 style="margin-top:20px">Project a Path — the frost decides nothing; people do</h2>
+    <div class="scenario-btns" id="scBtns"></div>
+    <div class="sc-desc" id="scDesc"></div>
+  </div>
+  <div class="panel welfare">
+    <div class="big" id="wNum">—</div>
+    <div class="lbl">Projected world welfare loss<br>under selected path</div>
+  </div>
+</div>
+
+<footer>
+  Historical eras (2017–2026) compiled from WTO, IMF, Fed &amp; UNCTAD analyses · Live record pulled from ledger.json, harvested daily from IMF/Treasury/GPR sources · Figures are era snapshots and modelled scenario estimates, not forecasts · Interface homage to Frostpunk 2 (11 bit studios) — unaffiliated fan work
+</footer>
+</div>
+
+<script>
+/* ---------- static historical eras (pre-harvester record; not live) ---------- */
+const STATIC_ERAS=[
+ {yr:'2017',nm:'Before the Frost',trust:88,tension:12,dollar:'~66%',gold:'~375 t',goldNote:'Modest official-sector buying',gvt:'Treasuries lead',trade:'+4.6%',tradeNote:'Efficiency still routes the flows',penalty:'~0%',
+  west:88,east:62,non:55,
+  wn:'Supply chains routed purely on cost. Alignment barely priced in.',
+  en:'Integrated into Western-anchored trade and finance. Reserves parked in Treasuries.',
+  nn:'No pressure to choose. Trades freely with everyone.',
+  disp:'The generator runs. Goods move along the cheapest path, and no one asks which flag flies over the port. Trust is not discussed, because it has never been tested.'},
+ {yr:'2018',nm:'First Cracks',trust:80,tension:32,dollar:'~63%',gold:'~650 t',goldNote:'Buying quickens after tariff exchanges',gvt:'Treasuries lead',trade:'+3.0%',tradeNote:'US–China tariff rounds begin',penalty:'Opening',
+  west:82,east:68,non:56,
+  wn:'Tariff walls rise against the East. First talk of supply-chain security over cost.',
+  en:'Begins hedging exposure to Western systems. The East–West trade divide traces to this winter.',
+  nn:'First requests arrive: whose side are you on?',
+  disp:'A cold wind from two directions. The tariff exchanges of this winter seem small, but the ledger will later show this is where the East–West divide in trade flows begins.'},
+ {yr:'2022',nm:'The Reserve Freeze',trust:62,tension:68,dollar:'~58%',gold:'1,082 t',goldNote:'Watershed year — record official buying',gvt:'Treasuries lead, gap closing',trade:'+2.7%',tradeNote:'War in Ukraine reroutes energy & grain',penalty:'~-8%',
+  west:78,east:74,non:60,
+  wn:'Deploys the financial system itself as a weapon: ~$300bn in Russian reserves frozen.',
+  en:'Every treasury in the challenger bloc takes note: dollar assets can be switched off. Gold buying turns structural.',
+  nn:'Watches the freeze and quietly diversifies. Over 40 central banks join the gold queue.',
+  disp:'The order freezes an enemy\u2019s savings — roughly three hundred billion — and in doing so teaches every neutral treasurer the same lesson at once: the vault has a lock, and someone else holds the key. Trust, once spent, buys gold.'},
+ {yr:'2023–24',nm:'The Settling',trust:56,tension:58,dollar:'~55%',gold:'1,000+ t',goldNote:'Second & third consecutive years above 1,000 t',gvt:'Gap narrowing fast',trade:'+3.3%',tradeNote:'Volumes hold; the wiring reroutes beneath',penalty:'-11.8%',
+  west:76,east:76,non:64,
+  wn:'Friendshoring takes hold — FDI shifts toward Mexico, India, Europe.',
+  en:'Cross-bloc flows now run 11.8% below within-bloc flows. The gap stabilises rather than spirals.',
+  nn:'Absorbs rerouted trade from both sides. Its weight in the system grows.',
+  disp:'The gap between the blocs stops widening — a step-change, not yet a spiral. The aggregate numbers look deceptively calm while the wiring beneath the city is quietly re-laid, junction by junction, along lines of loyalty rather than cost.'},
+ {yr:'2025–26',nm:'The Tariff Storm',trust:44,tension:82,dollar:'<50%',gold:'1,000+ t',goldNote:'Third straight year above 1,000 t · 40+ banks',gvt:'Gold overtakes — ~$5.2tn',trade:'4.7% → 1.5–2.5%',tradeNote:'UNCTAD projects sharp 2026 slowdown',penalty:'-11.8%+',
+  west:72,east:78,non:70,
+  wn:'A wave of tariffs and investment restrictions — the deepest fragmentation in decades. Each wall creates winners who defend it.',
+  en:'Official gold holdings pass foreign-held Treasuries for the first time in generations. The single anchor drops below half.',
+  nn:'Two-thirds of world trade now runs through value chains being actively reshaped. The middle is now the system\u2019s remaining shock absorber.',
+  disp:'The storm arrives not as one blow but as a thousand small closures, each with its own constituency sworn to keep it shut. Gold in the vaults now outweighs the paper promises. Below half — for the first time, the city asks what holds the generator up.',
+  scenarios:[
+   {id:'managed',nm:'Managed Equilibrium',welfare:-0.019,tension_bump:0,
+    desc:'The blocs settle into a cold but stable two-system world. Incomplete fragmentation costs <em>-1.9% of world welfare</em> — the intra/inter-bloc gap holds at its step-change rather than spiralling. The middle stays unclaimed, and keeps the two halves connected.'},
+   {id:'ratchet',nm:'Ratchet Escalation',welfare:-0.027,tension_bump:10,
+    desc:'Restrictions create concentrated domestic winners, and winners defend walls. Each closure is politically impossible to unwind, so the ratchet only turns one way. The 2025–26 tariff wave reopens the gap and the system drifts toward the worst projections.'},
+   {id:'west',nm:'Nonaligned → West',welfare:-0.027,tension_bump:6,
+    desc:'The middle picks the incumbent order. Modelled world welfare loss deepens to <em>-2.7%</em> — the shock absorber becomes a wall, and the East is boxed into a smaller, harder bloc with less to lose.'},
+   {id:'east',nm:'Nonaligned → East',welfare:-0.037,tension_bump:14,
+    desc:'The middle tilts to the challenger. The costliest path modelled: <em>-3.7% of world welfare</em>. The incumbent financial system loses its periphery, and the two halves stop sharing anything worth protecting.'}
+  ]}
+];
+
+/* ---------- ledger fetch layer ---------- */
+const CACHE_KEY='worldledger.cache.v1';
+
+const pct=x=>x==null?'—':(x*100).toFixed(1)+'%';
+const tonnes=x=>x==null?'—':x.toLocaleString('en-US')+' t';
+const usdBn=x=>x==null?'—':'$'+(x/1000).toFixed(1)+'tn';
+
+/* map one ledger record (current ledger.json or a history/*.json snapshot)
+   into the era shape the renderer already knows how to draw */
+function ledgerToEra(l){
+ const m=l.metrics||{};
+ const gvt=m.gold_vs_treasuries_usd_bn;
+ const sealedDate=l.sealed_at?new Date(l.sealed_at):null;
+ const yr=sealedDate?sealedDate.toLocaleDateString('en-US',{month:'short',year:'numeric'}):'live';
+ return {
+  yr, nm:'Live Record', live:true, sealedAt:l.sealed_at,
+  trust:l.composites?.trust?.value ?? null,
+  tension:l.composites?.tension?.value ?? null,
+  dollar:pct(m.dollar_share_gold_incl?.value),
+  gold:tonnes(m.cb_gold_tonnes_4q?.value),
+  goldNote:m.cb_gold_tonnes_4q?.source||'',
+  gvt: gvt ? `Gold ${usdBn(gvt.gold)} vs Treasuries ${usdBn(gvt.treasuries)}` : '—',
+  trade:m.trade_growth_yoy?.value!=null?pct(m.trade_growth_yoy.value):'—',
+  tradeNote:m.trade_growth_yoy?.source||'Not yet harvested (v2)',
+  penalty:m.cross_bloc_penalty?.value!=null?pct(m.cross_bloc_penalty.value):'—',
+  west:l.blocs?.west?.cohesion ?? 0,
+  east:l.blocs?.east?.cohesion ?? 0,
+  non:l.blocs?.nonaligned?.cohesion ?? 0,
+  wn:l.blocs?.west?.note||'',
+  en:l.blocs?.east?.note||'',
+  nn:l.blocs?.nonaligned?.note||'',
+  disp:l.dispatch||'',
+  scenarios:l.scenarios||null,
+ };
+}
+
+async function fetchJSON(url){
+ const resp=await fetch(url,{cache:'no-store'});
+ if(!resp.ok) throw new Error(`${url} -> ${resp.status}`);
+ return resp.json();
+}
+
+/* discover history files via a manifest if present, else just try the current month */
+async function loadHistoryEras(currentSealedAt){
+ try{
+  const manifest=await fetchJSON('../history/index.json');
+  const files=(manifest.files||[]).filter(f=>true);
+  const eras=[];
+  for(const f of files){
+   try{
+    const snap=await fetchJSON(`../history/${f}`);
+    if(snap.sealed_at===currentSealedAt) continue; // avoid duplicating the live node
+    eras.push(ledgerToEra(snap));
+   }catch(e){ console.warn('history file failed', f, e); }
+  }
+  return eras.sort((a,b)=>(a.sealedAt||'').localeCompare(b.sealedAt||''));
+ }catch(e){
+  return []; // no manifest yet -- fine, live era still renders from ledger.json
+ }
+}
+
+async function loadLedger(){
+ try{
+  const ledger=await fetchJSON('../ledger.json');
+  localStorage.setItem(CACHE_KEY, JSON.stringify(ledger));
+  setFeedState(false, ledger.sealed_at);
+  return ledger;
+ }catch(e){
+  console.warn('ledger fetch failed, falling back to cache', e);
+  const cached=localStorage.getItem(CACHE_KEY);
+  if(cached){
+   const ledger=JSON.parse(cached);
+   setFeedState(true, ledger.sealed_at);
+   return ledger;
+  }
+  setFeedState(true, null);
+  throw e;
+ }
+}
+
+function setFeedState(offline, sealedAt){
+ $('feedState').textContent = offline ? 'RECORD SEALED — OFFLINE, LAST KNOWN STATE' : 'LIVE FEED';
+ $('sealedDate').textContent = sealedAt
+  ? new Date(sealedAt).toLocaleString('en-US',{day:'2-digit',month:'short',year:'numeric'}).toUpperCase()
+  : '—';
+}
+
+/* ---------- build ---------- */
+const $=id=>document.getElementById(id);
+
+/* dial ticks */
+(()=>{const g=$('ticks');for(let i=0;i<=10;i++){const a=Math.PI-(i/10)*Math.PI;
+ const x1=150+108*Math.cos(a),y1=165-108*Math.sin(a),x2=150+118*Math.cos(a),y2=165-118*Math.sin(a);
+ g.innerHTML+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/>`;}})();
+
+let ERAS=[...STATIC_ERAS];
+let SCENARIOS_BASE=[
+ {id:'managed',nm:'Managed Equilibrium',col:'#e0a03d'},
+ {id:'ratchet',nm:'Ratchet Escalation',col:'#c9552e'},
+ {id:'west',nm:'Nonaligned → West',col:'#a8d8e8'},
+ {id:'east',nm:'Nonaligned → East',col:'#b23430'},
+];
+let SCENARIOS=[];
+let curEra=STATIC_ERAS.length-1, curSc=0;
+
+const T_STATES=[[25,'Calm','#7ab88a'],[50,'Strain','#e0a03d'],[75,'Fracture','#c9552e'],[101,'Rupture','#b23430']];
+
+function renderTimeline(){
+ $('tlTrack').innerHTML='';
+ ERAS.forEach((e,i)=>{
+  const b=document.createElement('button');b.className='era'+(e.live?' live':'');b.role='tab';
+  b.innerHTML=`<span class="node"></span><div class="yr">${e.yr}</div><div class="nm">${e.nm}</div>`;
+  b.onclick=()=>setEra(i);$('tlTrack').appendChild(b);
+ });
+}
+
+function renderScenarioButtons(){
+ $('scBtns').innerHTML='';
+ SCENARIOS.forEach((s,i)=>{
+  const b=document.createElement('button');b.className='sc-btn';b.textContent=s.nm;
+  b.onclick=()=>setScenario(i);$('scBtns').appendChild(b);
+ });
+}
+
+function setEra(i){
+ curEra=i;const e=ERAS[i];
+ document.querySelectorAll('.era').forEach((el,j)=>el.classList.toggle('active',j===i));
+ /* scenarios travel with the era: live eras carry their own modelled paths */
+ SCENARIOS=(e.scenarios||[]).length
+  ? e.scenarios.map(s=>({id:s.id,nm:s.nm,w:pct(s.welfare),col:SCENARIOS_BASE.find(b=>b.id===s.id)?.col||'#e0a03d',tBump:s.tension_bump,d:s.desc}))
+  : SCENARIOS_BASE.map(b=>({...b,w:'—',tBump:0,d:'No modelled scenarios published for this era.'}));
+ renderScenarioButtons();
+ if(curSc>=SCENARIOS.length) curSc=0;
+ /* dial: trust 0-100 → arc + needle */
+ const trust=e.trust??0;
+ $('arcFill').style.strokeDashoffset=377-(377*trust/100);
+ $('needle').style.transform=`rotate(${-90+(trust/100)*180}deg)`;
+ $('trustNum').textContent=e.trust??'—';
+ /* stats */
+ $('stDollar').textContent=e.dollar;
+ $('stGold').textContent=e.gold;$('stGoldNote').textContent=e.goldNote;
+ $('stGvT').textContent=e.gvt;
+ $('stTrade').textContent=e.trade;$('stTradeNote').textContent=e.tradeNote;
+ $('stPenalty').textContent=e.penalty;
+ /* blocs */
+ $('cWest').style.width=e.west+'%';$('cEast').style.width=e.east+'%';$('cNon').style.width=e.non+'%';
+ $('nWest').textContent=e.wn;$('nEast').textContent=e.en;$('nNon').textContent=e.nn;
+ /* dispatch */
+ const d=$('dispatch');d.style.opacity=0;
+ setTimeout(()=>{d.innerHTML=e.disp+`<span class="sig">— steward's log, ${e.yr} · ${e.nm}</span>`;d.style.opacity=1;},350);
+ setScenario(curSc);
+}
+
+function setScenario(i){
+ curSc=i;const s=SCENARIOS[i];
+ document.querySelectorAll('.sc-btn').forEach((el,j)=>el.classList.toggle('active',j===i));
+ $('scDesc').innerHTML=s.d;
+ $('wNum').textContent=s.w;$('wNum').style.color=s.col;
+ applyTension();
+}
+
+function applyTension(){
+ const base=ERAS[curEra].tension??0, t=Math.min(100,base+(SCENARIOS[curSc]?.tBump||0));
+ $('tFill').style.width=t+'%';
+ const st=T_STATES.find(x=>t<x[0]);
+ $('tState').textContent=st[1];$('tState').style.color=st[2];
+ $('frost').style.opacity=(0.15+t/100*0.75).toFixed(2);
+}
+
+async function init(){
+ renderTimeline();
+ setEra(curEra); // paint immediately from static seed while the network call is in flight
+ try{
+  const ledger=await loadLedger();
+  const liveEra=ledgerToEra(ledger);
+  const historyEras=await loadHistoryEras(ledger.sealed_at);
+  ERAS=[...STATIC_ERAS, ...historyEras, liveEra];
+  curEra=ERAS.length-1;
+  renderTimeline();
+  setEra(curEra);
+ }catch(e){
+  console.error('could not load live ledger', e);
+ }
+}
+
+init();
+</script>
+</body>
+</html>
