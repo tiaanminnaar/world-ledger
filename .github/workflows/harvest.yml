@@ -1,0 +1,41 @@
+name: Harvest ledger
+
+on:
+  schedule:
+    - cron: '0 4 * * *'  # daily, 04:00 UTC
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: harvest
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r harvester/requirements.txt
+
+      - name: Run harvester
+        run: python harvester/pipeline.py
+
+      - name: Commit ledger if changed
+        run: |
+          git config user.name "world-ledger-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add ledger.json history/
+          if git diff --cached --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "Harvest: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+            git push
+          fi
