@@ -1,15 +1,15 @@
 {
-  "sealed_at": "2026-07-14T14:04:30Z",
+  "sealed_at": "2026-07-14T17:44:30Z",
   "schema_version": 1,
   "composites": {
     "trust": {
       "value": 33.5,
-      "delta": 4.5
+      "delta": 0.0
     },
     "tension": {
       "value": 25.9,
       "state": "Strain",
-      "delta": 4.6,
+      "delta": 0.0,
       "note": "GDELT term pending (v2); weights renormalised over GPR + cross-bloc penalty"
     }
   },
@@ -26,7 +26,7 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4086.0,
+      "value": 4069.2,
       "as_of": "2026-07-14",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
@@ -38,7 +38,7 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4729.2,
+      "gold": 4709.8,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
