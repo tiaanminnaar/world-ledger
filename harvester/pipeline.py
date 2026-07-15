@@ -2,16 +2,16 @@
 """World Ledger harvester.
 
 Pulls the real-time-ish sources named in the spec (GPR spreadsheet, gold
-price, TIC foreign Treasury holdings, IMF COFER dollar share), merges the
-editorial layer, computes the trust/tension composites, and writes
-ledger.json.
+price, TIC foreign Treasury holdings, IMF COFER dollar share, GDELT tone),
+merges the editorial layer, computes the trust/tension composites, and
+writes ledger.json.
 
 Run manually: python harvester/pipeline.py
 Runs daily via GitHub Actions (.github/workflows/harvest.yml).
 
-WGC gold demand history and GDELT are not wired yet -- those metrics come
-from editorial.json for now and are flagged "editorial": true in the
-output, per the spec's harvestable/editorial split.
+WGC gold demand history is not wired yet -- that metric comes from
+editorial.json for now and is flagged "editorial": true in the output,
+per the spec's harvestable/editorial split.
 
 COFER request shape (IMF SDMX 3.0, saved per the spec's "budget a full
 evening, save the exact request URL" advice -- dimension order is
@@ -23,6 +23,15 @@ COUNTRY.INDICATOR.FXR_CURRENCY.TYPE_OF_TRANSFORMATION.FREQUENCY):
 COFER's "dollar share" excludes gold by definition (it's a reserves-composition
 series, not including monetary gold) -- the gold-inclusive figure the spec
 formula wants is derived here from these two series plus live gold price.
+
+GDELT request shape (DOC 2.0 API, no auth, rate-limited to ~1 req/5s --
+this harvester makes exactly one call per run so that's never an issue):
+  https://api.gdeltproject.org/api/v2/doc/doc?query=(sanctions OR tariff OR
+    "trade war" OR geopolitical OR conflict)&mode=timelinetone&format=json&timespan=30d
+    -> daily average tone (-100..+100, negative = negative coverage) for the
+       query over the trailing 30 days; we average the daily points into
+       one gdelt_conflict_tone_30d figure, per the spec's "always aggregate
+       over windows, never react to single events" warning.
 """
 import json
 import re
@@ -46,6 +55,8 @@ TIC_URL = "https://ticdata.treasury.gov/resource-center/data-chart-center/tic/Do
 COFER_BASE = "https://api.imf.org/external/sdmx/3.0/data/dataflow/IMF.STA/COFER/+/G001.AFXRA"
 COFER_SHARE_URL = f"{COFER_BASE}.CI_USD.SHRO_PT.Q"
 COFER_TOTAL_URL = f"{COFER_BASE}.CI_T.NV_USD.Q"
+GDELT_URL = "https://api.gdeltproject.org/api/v2/doc/doc"
+GDELT_QUERY = '(sanctions OR tariff OR "trade war" OR geopolitical OR conflict)'
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (world-ledger harvester; personal project)"}
 OZ_PER_TONNE = 32150.7466
@@ -58,6 +69,10 @@ MAX_JUMP = {
     "gpr_index": 2.5, "gold_price_usd_oz": 0.15, "tic_foreign_holdings_usd_bn": 0.20,
     "cofer_usd_share_of_allocated": 0.15, "cofer_allocated_total_usd_bn": 0.15,
 }
+# GDELT tone oscillates close to zero, where a percentage-jump gate is
+# unstable (small denominators inflate trivial swings) -- use an absolute
+# swing threshold instead, on the -100..+100 tone scale.
+GDELT_MAX_ABS_JUMP = 4.0
 
 
 def load_previous_ledger():
@@ -217,6 +232,39 @@ def fetch_cofer(prev_metrics):
         return None  # no COFER ever fetched yet -- caller falls back to editorial
 
 
+def fetch_gdelt(prev_metrics):
+    """GDELT DOC 2.0 timelinetone: daily average tone of conflict/tariff/
+    sanctions coverage, aggregated over the trailing 30 days. No live feed
+    existed for this in v1 -- optional, degrades to the tension composite's
+    existing renormalised weights (GPR + penalty only) if unavailable."""
+    try:
+        resp = requests.get(GDELT_URL, headers=HEADERS, timeout=30, params={
+            "query": GDELT_QUERY, "mode": "timelinetone", "format": "json", "timespan": "30d",
+        })
+        resp.raise_for_status()
+        points = resp.json()["timeline"][0]["data"]
+        if not points:
+            raise ValueError("empty GDELT timeline")
+        tone_30d = sum(p["value"] for p in points) / len(points)
+        as_of = points[-1]["date"][:8]
+        as_of = f"{as_of[:4]}-{as_of[4:6]}-{as_of[6:8]}"
+
+        prev = prev_metrics.get("gdelt_conflict_tone_30d", {}).get("value") if prev_metrics else None
+        if prev is not None and abs(tone_30d - prev) > GDELT_MAX_ABS_JUMP:
+            print(f"[warn] gdelt_conflict_tone_30d jumped {prev} -> {tone_30d} -- rejecting, marking stale", file=sys.stderr)
+            raise ValueError("failed sanity gate")
+
+        return {"value": round(tone_30d, 3), "as_of": as_of,
+                "source": f"GDELT DOC 2.0 (30d avg tone, query: {GDELT_QUERY})", "stale": False}
+    except Exception as e:
+        print(f"[warn] GDELT fetch failed: {e}", file=sys.stderr)
+        if prev_metrics and "gdelt_conflict_tone_30d" in prev_metrics:
+            m = dict(prev_metrics["gdelt_conflict_tone_30d"])
+            m["stale"] = True
+            return m
+        return None  # no GDELT ever fetched yet -- tension falls back to renormalised weights
+
+
 def norm(x, lo, hi):
     if x is None:
         return None
@@ -244,6 +292,7 @@ def main():
     gold = fetch_gold(prev_metrics)
     tic = fetch_tic(prev_metrics)
     cofer = fetch_cofer(prev_metrics)
+    gdelt = fetch_gdelt(prev_metrics)
 
     gpr_baseline_min = gpr["gpr_baseline_min"] if gpr["gpr_baseline_min"] is not None else None
     gpr_baseline_max = gpr["gpr_baseline_max"] if gpr["gpr_baseline_max"] is not None else None
@@ -286,11 +335,17 @@ def main():
     trust_weight = sum(w for w, v in trust_terms if v is not None)
     trust = round(100 * sum(w * v for w, v in trust_terms if v is not None) / trust_weight, 1) if trust_weight else None
 
-    # ---- tension ---- (GDELT term is v2 -- not fetched yet; weights renormalised over what we have)
+    # ---- tension ---- (weights renormalise over whichever terms are available this run)
     n_gpr_monthly = norm(gpr["gpr_index"]["value"], gpr_baseline_min, gpr_baseline_max) if gpr_baseline_min is not None else None
     n_penalty = norm(ed["cross_bloc_penalty"]["value"], baseline["cross_bloc_penalty"]["min"], baseline["cross_bloc_penalty"]["max"])
+    # GDELT tone: more negative = more conflict coverage = more tension, so
+    # invert after normalising (norm maps low-tone/high-conflict toward 0).
+    n_gdelt = None
+    if gdelt is not None:
+        n_gdelt_raw = norm(gdelt["value"], baseline["gdelt_conflict_tone_30d"]["min"], baseline["gdelt_conflict_tone_30d"]["max"])
+        n_gdelt = 1 - n_gdelt_raw if n_gdelt_raw is not None else None
 
-    tension_terms = [(0.55, n_gpr_monthly), (0.20, n_penalty)]
+    tension_terms = [(0.55, n_gpr_monthly), (0.25, n_gdelt), (0.20, n_penalty)]
     tension_weight = sum(w for w, v in tension_terms if v is not None)
     tension = round(100 * sum(w * v for w, v in tension_terms if v is not None) / tension_weight, 1) if tension_weight else None
 
@@ -304,7 +359,9 @@ def main():
             "trust": {"value": trust, "delta": None if prev_trust is None else round(trust - prev_trust, 1)},
             "tension": {"value": tension, "state": tension_state(tension),
                         "delta": None if prev_tension is None else round(tension - prev_tension, 1),
-                        "note": "GDELT term pending (v2); weights renormalised over GPR + cross-bloc penalty"},
+                        "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty"
+                                if gdelt is not None else
+                                "GDELT unavailable this run; weights renormalised over GPR + cross-bloc penalty"},
         },
         "metrics": {
             "gpr_index": gpr["gpr_index"],
@@ -320,6 +377,7 @@ def main():
                 "cofer_usd_share_of_allocated": cofer["cofer_usd_share_of_allocated"],
                 "cofer_allocated_total_usd_bn": cofer["cofer_allocated_total_usd_bn"],
             } if cofer is not None else {}),
+            **({"gdelt_conflict_tone_30d": gdelt} if gdelt is not None else {}),
         },
         "blocs": editorial["blocs"],
         "dispatch": editorial["dispatch"],
