@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-07-16T06:13:15Z",
+  "sealed_at": "2026-07-17T06:11:40Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -26,8 +26,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4038.3,
-      "as_of": "2026-07-16",
+      "value": 3991.4,
+      "as_of": "2026-07-17",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -38,13 +38,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4674.0,
+      "gold": 4619.8,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4211,
+      "value": 0.4224,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
