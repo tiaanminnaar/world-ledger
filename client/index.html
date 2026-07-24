@@ -204,6 +204,62 @@ header{
 
 footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;font-size:9px;letter-spacing:.12em;color:var(--frost-dim);line-height:1.8;text-transform:uppercase}
 
+/* ---------- mechanics modal ---------- */
+.mech-link{
+  background:none;border:none;color:var(--heat);font-family:inherit;font-size:inherit;
+  letter-spacing:.14em;text-transform:uppercase;cursor:pointer;padding:0;text-decoration:underline;
+  text-underline-offset:2px;
+}
+.mech-link:hover{color:var(--frost-bright)}
+.mech-overlay{
+  position:fixed;inset:0;z-index:100;background:rgba(3,5,9,.85);
+  display:flex;align-items:flex-start;justify-content:center;
+  padding:40px 20px;overflow-y:auto;
+}
+.mech-overlay[hidden]{display:none}
+.mech-panel{
+  background:linear-gradient(180deg,var(--steel-lit),var(--steel));
+  border:1px solid var(--hairline);max-width:820px;width:100%;
+  padding:28px 30px 34px;position:relative;
+  clip-path:polygon(18px 0,100% 0,100% calc(100% - 18px),calc(100% - 18px) 100%,0 100%,0 18px);
+}
+.mech-close{
+  position:absolute;top:18px;right:20px;background:none;border:1px solid var(--hairline);
+  color:var(--frost-dim);font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;cursor:pointer;padding:6px 12px;
+}
+.mech-close:hover{color:var(--frost-bright);border-color:var(--frost-dim)}
+.mech-panel h2{
+  font-family:'Oswald',sans-serif;font-weight:500;font-size:20px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--frost-bright);margin-bottom:4px;
+}
+.mech-panel .mech-sub{font-size:11px;color:var(--frost-dim);letter-spacing:.08em;margin-bottom:22px}
+.mech-panel h3{
+  font-family:'Oswald',sans-serif;font-weight:400;font-size:13px;letter-spacing:.2em;
+  text-transform:uppercase;color:var(--heat);margin:22px 0 10px;
+}
+.mech-panel h3:first-of-type{margin-top:0}
+.mech-formula{
+  font-family:'IBM Plex Mono',monospace;font-size:12.5px;line-height:1.9;color:var(--frost-bright);
+  background:#0a0f17;border:1px solid var(--hairline);padding:14px 16px;white-space:pre-wrap;
+}
+.mech-panel p{font-size:12px;line-height:1.7;color:var(--frost);margin-top:8px}
+.mech-thresh{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:10px;letter-spacing:.1em;text-transform:uppercase}
+.mech-thresh span{color:var(--frost-dim)}
+.mech-thresh b{color:var(--frost-bright);font-weight:500}
+.mech-table{width:100%;border-collapse:collapse;margin-top:6px;font-size:11px}
+.mech-table th{
+  text-align:left;font-family:'Oswald',sans-serif;font-weight:400;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--frost-dim);font-size:9.5px;padding:6px 8px;
+  border-bottom:1px solid var(--hairline);
+}
+.mech-table td{padding:7px 8px;border-bottom:1px dashed rgba(168,216,232,.1);color:var(--frost);vertical-align:top}
+.mech-table td.mv{color:var(--frost-bright);font-weight:500;white-space:nowrap}
+.mech-badge{font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor}
+.mech-badge.live{color:var(--ok)}
+.mech-badge.editorial{color:var(--heat)}
+.mech-badge.stale{color:var(--ember)}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -219,7 +275,7 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
   <div class="datestamp">
     <span id="sealedLabel">RECORD SEALED</span> · <b id="sealedDate">—</b><br>
     <span id="feedState">LOADING LEDGER…</span><br>
-    OBSERVER STATION · NONALIGNED SOUTH
+    OBSERVER STATION · NONALIGNED SOUTH · <button id="mechBtn" class="mech-link">MECHANICS</button>
   </div>
 </header>
 
@@ -336,6 +392,37 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
 <footer>
   Historical eras (2017–2026) compiled from WTO, IMF, Fed &amp; UNCTAD analyses · Live record pulled from ledger.json, harvested daily from IMF/Treasury/GPR sources · Figures are era snapshots and modelled scenario estimates, not forecasts · Interface homage to Frostpunk 2 (11 bit studios) — unaffiliated fan work
 </footer>
+</div>
+
+<div class="mech-overlay" id="mechOverlay" hidden role="dialog" aria-modal="true" aria-label="Ledger mechanics">
+  <div class="mech-panel">
+    <button class="mech-close" id="mechClose">Close ✕</button>
+    <h2>Ledger Mechanics</h2>
+    <div class="mech-sub">How the dial and the tension bar are computed — reproducible, not vibes.</div>
+
+    <h3>Reserve Trust (0–100)</h3>
+    <div class="mech-formula">trust = 100 × ( 0.45 × norm(dollar_share_gold_incl)
+              + 0.25 × norm(treasuries_vs_gold_ratio)
+              + 0.20 × (1 − norm(cb_gold_purchases_trailing_4q))
+              + 0.10 × (1 − norm(gpr_index_12m_avg)) )</div>
+    <p>Each series is normalised 0–1 against its own historical min/max baseline window (2000–2015 where a real historical feed exists; an editorial estimate otherwise — see the provenance table below). If a term is unavailable on a given day, its weight is dropped and the rest renormalise to sum to 1, rather than the composite going blank.</p>
+
+    <h3>Geopolitical Tension (0–100)</h3>
+    <div class="mech-formula">tension = 100 × ( 0.55 × norm(gpr_monthly)
+                + 0.25 × norm(gdelt_conflict_tone_30d, inverted)
+                + 0.20 × norm(cross_bloc_penalty) )</div>
+    <p>GPR does most of the work; GDELT's 30-day average tone (inverted — more negative coverage tone raises tension) supplies the between-releases movement; the cross-bloc penalty term raises the floor so tension can't fully calm while the wiring stays structurally split. Same renormalisation rule as trust applies if a term is missing.</p>
+    <div class="mech-thresh">
+      <span>Thresholds:</span> <b>Calm</b> &lt;25 &nbsp; <b>Strain</b> &lt;50 &nbsp; <b>Fracture</b> &lt;75 &nbsp; <b>Rupture</b> ≥75
+    </div>
+
+    <h3>Data Provenance — this record</h3>
+    <p>Every metric below is read live from the currently displayed ledger record.</p>
+    <table class="mech-table" id="mechTable">
+      <thead><tr><th>Metric</th><th>Value</th><th>As of</th><th>Status</th><th>Source</th></tr></thead>
+      <tbody id="mechTableBody"><tr><td colspan="5">Loading…</td></tr></tbody>
+    </table>
+  </div>
 </div>
 
 <script>
@@ -557,16 +644,67 @@ async function init(){
  setEra(curEra); // paint immediately from static seed while the network call is in flight
  try{
   const ledger=await loadLedger();
+  currentLedger=ledger;
   const liveEra=ledgerToEra(ledger);
   const historyEras=await loadHistoryEras(ledger.sealed_at);
   ERAS=[...STATIC_ERAS, ...historyEras, liveEra];
   curEra=ERAS.length-1;
   renderTimeline();
   setEra(curEra);
+  renderMechanicsTable();
  }catch(e){
   console.error('could not load live ledger', e);
  }
 }
+
+/* ---------- mechanics modal ---------- */
+let currentLedger=null;
+
+const METRIC_LABELS={
+ gpr_index:'GPR index (monthly)',
+ gpr_index_12m_avg:'GPR index (12m avg)',
+ gold_price_usd_oz:'Gold price (USD/oz)',
+ tic_foreign_holdings_usd_bn:'Foreign Treasury holdings',
+ gold_vs_treasuries_usd_bn:'Gold vs Treasuries',
+ dollar_share_gold_incl:'Dollar share (gold-inclusive)',
+ cb_gold_tonnes_4q:'Central-bank gold demand',
+ cross_bloc_penalty:'Cross-bloc trade penalty',
+ cofer_usd_share_of_allocated:'COFER: USD share of allocated',
+ cofer_allocated_total_usd_bn:'COFER: allocated total (USD)',
+ gdelt_conflict_tone_30d:'GDELT conflict tone (30d avg)',
+};
+
+function mechFormatValue(key,m){
+ if(key==='gold_vs_treasuries_usd_bn') return `Gold $${(m.gold/1000).toFixed(1)}tn / Treas $${(m.treasuries/1000).toFixed(1)}tn`;
+ if(typeof m.value!=='number') return '—';
+ if(key.includes('share')||key==='cross_bloc_penalty') return pct(m.value);
+ if(key==='cb_gold_tonnes_4q') return m.value.toLocaleString('en-US')+' t';
+ if(key.includes('usd_bn')) return '$'+m.value.toLocaleString('en-US')+'bn';
+ if(key==='gold_price_usd_oz') return '$'+m.value.toLocaleString('en-US');
+ return String(m.value);
+}
+
+function renderMechanicsTable(){
+ const body=$('mechTableBody');
+ if(!currentLedger){ body.innerHTML='<tr><td colspan="5">No ledger loaded.</td></tr>'; return; }
+ const rows=Object.entries(currentLedger.metrics||{}).map(([key,m])=>{
+  const label=METRIC_LABELS[key]||key;
+  const value=mechFormatValue(key,m);
+  const asOf=m.as_of||'—';
+  const badge=m.editorial ? '<span class="mech-badge editorial">Editorial</span>'
+            : m.stale ? '<span class="mech-badge stale">Stale</span>'
+            : '<span class="mech-badge live">Live</span>';
+  return `<tr><td>${label}</td><td class="mv">${value}</td><td>${asOf}</td><td>${badge}</td><td>${m.source||m.note||'—'}</td></tr>`;
+ });
+ body.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="5">No metrics in this record.</td></tr>';
+}
+
+function openMechanics(){ $('mechOverlay').hidden=false; renderMechanicsTable(); }
+function closeMechanics(){ $('mechOverlay').hidden=true; }
+$('mechBtn').addEventListener('click', openMechanics);
+$('mechClose').addEventListener('click', closeMechanics);
+$('mechOverlay').addEventListener('click', e=>{ if(e.target.id==='mechOverlay') closeMechanics(); });
+document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('mechOverlay').hidden) closeMechanics(); });
 
 init();
 </script>
