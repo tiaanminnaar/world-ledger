@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-07-23T06:26:35Z",
+  "sealed_at": "2026-07-24T06:21:46Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -7,10 +7,10 @@
       "delta": 0.0
     },
     "tension": {
-      "value": 25.9,
+      "value": 32.9,
       "state": "Strain",
-      "delta": 0.0,
-      "note": "GDELT unavailable this run; weights renormalised over GPR + cross-bloc penalty"
+      "delta": 7.0,
+      "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty"
     }
   },
   "metrics": {
@@ -26,8 +26,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4125.7,
-      "as_of": "2026-07-23",
+      "value": 4028.7,
+      "as_of": "2026-07-24",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -38,13 +38,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4775.2,
+      "gold": 4662.9,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4187,
+      "value": 0.4214,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -71,6 +71,12 @@
       "value": 13104.9,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated reserves, all currencies, nominal USD)",
+      "stale": false
+    },
+    "gdelt_conflict_tone_30d": {
+      "value": -2.323,
+      "as_of": "2026-07-24",
+      "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
       "stale": false
     }
   },
