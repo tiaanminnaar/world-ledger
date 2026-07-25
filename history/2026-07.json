@@ -1,16 +1,69 @@
 {
-  "sealed_at": "2026-07-25T06:12:07Z",
+  "sealed_at": "2026-07-25T19:35:51Z",
   "schema_version": 1,
   "composites": {
     "trust": {
       "value": 33.5,
-      "delta": 0.0
+      "delta": 0.0,
+      "components": [
+        {
+          "id": "dollar_share",
+          "weight": 0.45,
+          "norm": 0.0,
+          "contribution": 0.0,
+          "delta_contrib": 0.0
+        },
+        {
+          "id": "treasuries_ratio",
+          "weight": 0.25,
+          "norm": 1.0,
+          "contribution": 25.0,
+          "delta_contrib": 0.0
+        },
+        {
+          "id": "gold_buying",
+          "weight": 0.2,
+          "norm": 0.057,
+          "contribution": 1.14,
+          "delta_contrib": 0.0
+        },
+        {
+          "id": "gpr_12m",
+          "weight": 0.1,
+          "norm": 0.7323,
+          "contribution": 7.32,
+          "delta_contrib": 0.0
+        }
+      ]
     },
     "tension": {
-      "value": 32.9,
+      "value": 33.0,
       "state": "Strain",
-      "delta": 0.0,
-      "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty"
+      "delta": 0.1,
+      "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty",
+      "components": [
+        {
+          "id": "gpr_monthly",
+          "weight": 0.55,
+          "norm": 0.2751,
+          "contribution": 15.13,
+          "delta_contrib": 0.0
+        },
+        {
+          "id": "gdelt",
+          "weight": 0.25,
+          "norm": 0.5448,
+          "contribution": 13.62,
+          "delta_contrib": 0.11
+        },
+        {
+          "id": "cross_bloc_penalty",
+          "weight": 0.2,
+          "norm": 0.2133,
+          "contribution": 4.27,
+          "delta_contrib": 0.0
+        }
+      ]
     }
   },
   "metrics": {
@@ -74,10 +127,10 @@
       "stale": false
     },
     "gdelt_conflict_tone_30d": {
-      "value": -2.323,
-      "as_of": "2026-07-24",
+      "value": -2.358,
+      "as_of": "2026-07-25",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
-      "stale": true
+      "stale": false
     }
   },
   "blocs": {

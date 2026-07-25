@@ -271,6 +271,42 @@ def norm(x, lo, hi):
     return max(0.0, min(1.0, (x - lo) / (hi - lo)))
 
 
+def composite_from_terms(terms):
+    """terms: list of (id: str, raw_weight: float, oriented_norm: float|None) --
+    oriented_norm is already inversion-adjusted by the caller (e.g. `1 - norm(...)`)
+    so higher always means "more of the composite" here.
+    Returns (value: float|None rounded to 1dp, components: list[dict]) where each
+    dict is {id, weight (post-renormalization, 4dp), norm (4dp), contribution (2dp)}
+    for terms that had a non-None value this run."""
+    available = [(cid, w, v) for cid, w, v in terms if v is not None]
+    weight_sum = sum(w for _, w, v in available)
+    if not weight_sum:
+        return None, []
+    value = round(100 * sum(w * v for _, w, v in available) / weight_sum, 1)
+    components = []
+    for cid, w, v in available:
+        eff_w = w / weight_sum
+        components.append({
+            "id": cid,
+            "weight": round(eff_w, 4),
+            "norm": round(v, 4),
+            "contribution": round(100 * eff_w * v, 2),
+        })
+    return value, components
+
+
+def with_delta_contrib(components, prev_components):
+    """Attach delta_contrib (2dp) vs. the previous ledger's same-id component's
+    contribution. None if that id wasn't present previously (first run after this
+    ships, or the term simply wasn't fetchable last run)."""
+    prev_by_id = {c["id"]: c["contribution"] for c in (prev_components or [])}
+    return [
+        {**c, "delta_contrib": (round(c["contribution"] - prev_by_id[c["id"]], 2)
+                                 if c["id"] in prev_by_id else None)}
+        for c in components
+    ]
+
+
 def tension_state(t):
     if t < 25:
         return "Calm"
@@ -330,10 +366,13 @@ def main():
                        baseline["cb_gold_purchases_trailing_4q_tonnes"]["max"])
     n_gpr_12m = norm(gpr["gpr_index_12m_avg"], gpr_baseline_min, gpr_baseline_max) if gpr_baseline_min is not None else None
 
-    trust_terms = [(0.45, n_dollar), (0.25, n_ratio), (0.20, (1 - n_gold_buy) if n_gold_buy is not None else None),
-                   (0.10, (1 - n_gpr_12m) if n_gpr_12m is not None else None)]
-    trust_weight = sum(w for w, v in trust_terms if v is not None)
-    trust = round(100 * sum(w * v for w, v in trust_terms if v is not None) / trust_weight, 1) if trust_weight else None
+    trust_terms = [
+        ("dollar_share", 0.45, n_dollar),
+        ("treasuries_ratio", 0.25, n_ratio),
+        ("gold_buying", 0.20, (1 - n_gold_buy) if n_gold_buy is not None else None),
+        ("gpr_12m", 0.10, (1 - n_gpr_12m) if n_gpr_12m is not None else None),
+    ]
+    trust, trust_components = composite_from_terms(trust_terms)
 
     # ---- tension ---- (weights renormalise over whichever terms are available this run)
     n_gpr_monthly = norm(gpr["gpr_index"]["value"], gpr_baseline_min, gpr_baseline_max) if gpr_baseline_min is not None else None
@@ -345,23 +384,32 @@ def main():
         n_gdelt_raw = norm(gdelt["value"], baseline["gdelt_conflict_tone_30d"]["min"], baseline["gdelt_conflict_tone_30d"]["max"])
         n_gdelt = 1 - n_gdelt_raw if n_gdelt_raw is not None else None
 
-    tension_terms = [(0.55, n_gpr_monthly), (0.25, n_gdelt), (0.20, n_penalty)]
-    tension_weight = sum(w for w, v in tension_terms if v is not None)
-    tension = round(100 * sum(w * v for w, v in tension_terms if v is not None) / tension_weight, 1) if tension_weight else None
+    tension_terms = [
+        ("gpr_monthly", 0.55, n_gpr_monthly),
+        ("gdelt", 0.25, n_gdelt),
+        ("cross_bloc_penalty", 0.20, n_penalty),
+    ]
+    tension, tension_components = composite_from_terms(tension_terms)
 
     prev_trust = prev["composites"]["trust"]["value"] if prev else None
     prev_tension = prev["composites"]["tension"]["value"] if prev else None
+    prev_trust_components = prev["composites"]["trust"].get("components", []) if prev else []
+    prev_tension_components = prev["composites"]["tension"].get("components", []) if prev else []
+    trust_components = with_delta_contrib(trust_components, prev_trust_components)
+    tension_components = with_delta_contrib(tension_components, prev_tension_components)
 
     ledger = {
         "sealed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "schema_version": 1,
         "composites": {
-            "trust": {"value": trust, "delta": None if prev_trust is None else round(trust - prev_trust, 1)},
+            "trust": {"value": trust, "delta": None if prev_trust is None else round(trust - prev_trust, 1),
+                      "components": trust_components},
             "tension": {"value": tension, "state": tension_state(tension),
                         "delta": None if prev_tension is None else round(tension - prev_tension, 1),
                         "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty"
                                 if gdelt is not None else
-                                "GDELT unavailable this run; weights renormalised over GPR + cross-bloc penalty"},
+                                "GDELT unavailable this run; weights renormalised over GPR + cross-bloc penalty",
+                        "components": tension_components},
         },
         "metrics": {
             "gpr_index": gpr["gpr_index"],

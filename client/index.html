@@ -261,6 +261,56 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
 .mech-badge.editorial{color:var(--heat)}
 .mech-badge.stale{color:var(--ember)}
 
+/* ---------- attribution waterfall ---------- */
+.attr-hint{font-size:9px;letter-spacing:.1em;color:var(--frost-dim);text-transform:uppercase;margin-top:4px}
+#dial,#tensionBar{cursor:pointer}
+#dial:focus-visible,#tensionBar:focus-visible{outline:1px solid var(--heat);outline-offset:4px}
+.attr-waterfall{display:flex;flex-direction:column;gap:10px;margin-top:14px}
+.attr-row{display:grid;grid-template-columns:180px 1fr;gap:10px;align-items:center;font-size:11px}
+.attr-row-label{color:var(--frost);display:flex;flex-direction:column;gap:2px}
+.attr-row-delta{font-family:'Oswald',sans-serif;font-size:12px;font-weight:500}
+.attr-track{position:relative;height:14px;background:#0a0f17;border:1px solid var(--hairline)}
+.attr-track::before{content:'';position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--hairline)}
+.attr-bar{position:absolute;top:2px;bottom:2px;box-shadow:0 0 6px currentColor}
+.attr-empty{font-size:12px;color:var(--frost-dim);line-height:1.6;padding:10px 0}
+.attr-note{font-size:10px;color:var(--frost-dim);margin-top:14px;line-height:1.6}
+
+/* ---------- journal ---------- */
+.jrn-form{display:flex;flex-direction:column;gap:12px;margin-top:8px}
+.jrn-field{display:flex;flex-direction:column;gap:4px}
+.jrn-field label{font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--frost-dim)}
+.jrn-input,.jrn-select,.jrn-textarea{background:#0a0f17;border:1px solid var(--hairline);color:var(--frost);font-family:'IBM Plex Mono',monospace;font-size:12px;padding:8px 10px}
+.jrn-input:focus,.jrn-select:focus,.jrn-textarea:focus{outline:none;border-color:var(--heat)}
+.jrn-textarea{min-height:64px;resize:vertical}
+.jrn-predict-fields{display:flex;gap:12px;flex-wrap:wrap}
+.jrn-predict-fields .jrn-field{flex:1;min-width:140px}
+.jrn-warning{font-size:10px;color:var(--heat);letter-spacing:.06em}
+.jrn-submit{align-self:flex-start}
+.jrn-due-banner{background:rgba(224,160,61,.1);border:1px solid var(--heat);color:var(--heat);font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:10px 14px;margin:10px 0}
+.jrn-list{display:flex;flex-direction:column;gap:10px;margin-top:8px}
+.jrn-entry{border-left:2px solid var(--frost-dim);padding:8px 0 8px 14px}
+.jrn-entry.kind-event{border-left-color:var(--frost)}
+.jrn-entry.kind-prediction{border-left-color:var(--heat)}
+.jrn-entry.kind-note{border-left-color:var(--frost-dim)}
+.jrn-entry.overdue{border-left-color:var(--ember)}
+.jrn-entry-head{display:flex;gap:8px;align-items:center;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--frost-dim);margin-bottom:4px}
+.jrn-kind-badge{font-size:9px;letter-spacing:.08em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor}
+.jrn-kind-badge.event{color:var(--frost)}
+.jrn-kind-badge.prediction{color:var(--heat)}
+.jrn-kind-badge.note{color:var(--frost-dim)}
+.jrn-kind-badge.hit{color:var(--ok)}
+.jrn-kind-badge.miss{color:var(--blood)}
+.jrn-kind-badge.partial{color:var(--ember)}
+.jrn-body{font-size:12px;color:var(--frost);line-height:1.6}
+.jrn-snapshot{font-size:10px;color:var(--frost-dim);margin-top:4px}
+.jrn-resolve{display:flex;gap:8px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.jrn-resolve-btn{background:none;border:1px solid var(--hairline);font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:5px 10px;cursor:pointer}
+.jrn-resolve-btn.hit{color:var(--ok);border-color:var(--ok)}
+.jrn-resolve-btn.miss{color:var(--blood);border-color:var(--blood)}
+.jrn-resolve-btn.partial{color:var(--ember);border-color:var(--ember)}
+.jrn-refers{font-size:10px;color:var(--frost-dim);margin-top:4px}
+.jrn-export{margin:6px 0 10px;font-size:11px}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -276,7 +326,7 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
   <div class="datestamp">
     <span id="sealedLabel">RECORD SEALED</span> · <b id="sealedDate">—</b><br>
     <span id="feedState">LOADING LEDGER…</span><br>
-    OBSERVER STATION · NONALIGNED SOUTH · <button id="mechBtn" class="mech-link">MECHANICS</button> · <button id="alertBtn" class="mech-link">ALERTS: OFF</button>
+    OBSERVER STATION · NONALIGNED SOUTH · <button id="mechBtn" class="mech-link">MECHANICS</button> · <button id="alertBtn" class="mech-link">ALERTS: OFF</button> · <button id="journalBtn" class="mech-link">JOURNAL</button>
   </div>
 </header>
 
@@ -341,7 +391,7 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
         <span class="t-label">Geopolitical Tension</span>
         <span class="t-state" id="tState">—</span>
       </div>
-      <div class="tension-bar">
+      <div class="tension-bar" id="tensionBar">
         <div class="tension-fill" id="tFill"></div>
         <div class="tension-notches"><span></span><span></span><span></span><span></span></div>
       </div>
@@ -423,6 +473,47 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
       <thead><tr><th>Metric</th><th>Value</th><th>As of</th><th>Status</th><th>Source</th></tr></thead>
       <tbody id="mechTableBody"><tr><td colspan="5">Loading…</td></tr></tbody>
     </table>
+  </div>
+</div>
+
+<div class="mech-overlay" id="attrOverlay" hidden role="dialog" aria-modal="true" aria-label="Attribution breakdown">
+  <div class="mech-panel">
+    <button class="mech-close" id="attrClose">Close ✕</button>
+    <h2 id="attrTitle">Attribution</h2>
+    <div class="mech-sub" id="attrSummary"></div>
+    <div class="attr-waterfall" id="attrWaterfall"></div>
+    <p class="attr-note">Bars rank and explain the move; they may not sum exactly to the total when a data source drops out or returns between records — the total above is always the composite's own figure.</p>
+  </div>
+</div>
+
+<div class="mech-overlay" id="journalOverlay" hidden role="dialog" aria-modal="true" aria-label="Era journal">
+  <div class="mech-panel" id="journalBody">
+    <button class="mech-close" id="journalClose">Close ✕</button>
+    <h2>Era Journal</h2>
+    <div class="mech-sub">Predictions, notes, events — append-only, stored locally in this browser only.</div>
+    <div id="jrnDueBanner"></div>
+    <h3>New entry</h3>
+    <form id="jrnForm" class="jrn-form">
+      <div class="jrn-field"><label>Kind</label>
+        <select name="kind" class="jrn-select" id="jrnKind">
+          <option value="event">Event</option><option value="prediction">Prediction</option><option value="note">Note</option>
+        </select></div>
+      <div class="jrn-field"><label>Body</label><textarea name="body" class="jrn-textarea" required></textarea></div>
+      <div class="jrn-predict-fields" id="jrnPredictFields" hidden>
+        <div class="jrn-field"><label>Resolve by</label><input type="date" name="resolve_by" class="jrn-input"></div>
+        <div class="jrn-field"><label>Confidence</label>
+          <select name="confidence" class="jrn-select"><option value="">—</option><option value="low">Low</option><option value="medium">Medium</option><option value="high">High</option></select></div>
+      </div>
+      <div class="jrn-field"><label>Refers to entry (optional, for corrections)</label>
+        <select name="refers_to_id" class="jrn-select" id="jrnRefersTo"><option value="">— none —</option></select></div>
+      <div id="jrnSnapshotWarning" class="jrn-warning" hidden>Live ledger not loaded yet — this entry will save without a dial snapshot.</div>
+      <button type="submit" class="sc-btn jrn-submit">Save entry</button>
+    </form>
+    <h3>Calibration</h3>
+    <table class="mech-table" id="jrnStatsTable"><thead><tr><th>Confidence</th><th>Hit</th><th>Miss</th><th>Partial</th><th>Hit rate</th></tr></thead><tbody id="jrnStatsBody"></tbody></table>
+    <h3>Entries</h3>
+    <div class="jrn-export"><button class="mech-link" id="jrnExportJSON">Export JSON</button> · <button class="mech-link" id="jrnExportMD">Export Markdown</button></div>
+    <div class="jrn-list" id="jrnList"></div>
   </div>
 </div>
 
@@ -706,7 +797,84 @@ function closeMechanics(){ $('mechOverlay').hidden=true; }
 $('mechBtn').addEventListener('click', openMechanics);
 $('mechClose').addEventListener('click', closeMechanics);
 $('mechOverlay').addEventListener('click', e=>{ if(e.target.id==='mechOverlay') closeMechanics(); });
-document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('mechOverlay').hidden) closeMechanics(); });
+
+/* ---------- attribution waterfall ---------- */
+const COMPONENT_LABELS={
+ dollar_share:'Reserve dollar share', treasuries_ratio:'Treasuries vs gold ratio',
+ gold_buying:'CB gold buying', gpr_12m:'Geopolitical risk (12m)',
+ gpr_monthly:'Geopolitical risk (monthly)', gdelt:'Conflict coverage tone',
+ cross_bloc_penalty:'Cross-bloc trade penalty',
+};
+
+function isLiveEraActive(){ return !!ERAS[curEra]?.live; }
+
+function computeWaterfall(components){
+ return [...components].filter(c=>c.delta_contrib!==null)
+   .sort((a,b)=>Math.abs(b.delta_contrib)-Math.abs(a.delta_contrib));
+}
+
+function attributionSummary(which, compositeDelta, sorted){
+ const label = which==='trust' ? 'Trust' : 'Tension';
+ if(compositeDelta==null) return `${label}: no comparison available.`;
+ const top = sorted.slice(0,2).map(c=>`${(COMPONENT_LABELS[c.id]||c.id).toLowerCase()} (${c.delta_contrib>0?'+':''}${c.delta_contrib})`);
+ const sign = compositeDelta>0 ? '+' : '';
+ return top.length ? `${label} ${sign}${compositeDelta}: mostly ${top.join(', ')}.` : `${label} ${sign}${compositeDelta}.`;
+}
+
+function renderAttribution(which){
+ const body=$('attrWaterfall'), summaryEl=$('attrSummary');
+ $('attrTitle').textContent = which==='trust' ? 'Reserve Trust — Attribution' : 'Geopolitical Tension — Attribution';
+ if(!currentLedger || !isLiveEraActive()){
+  body.innerHTML='<p class="attr-empty">Attribution is only available for the live record. Select the live era on the timeline to view it.</p>';
+  summaryEl.textContent=''; return;
+ }
+ const composite=currentLedger.composites?.[which];
+ if(!composite || !('components' in composite)){
+  body.innerHTML='<p class="attr-empty">This record predates attribution tracking.</p>';
+  summaryEl.textContent=''; return;
+ }
+ if(!composite.components.length){
+  body.innerHTML='<p class="attr-empty">No component data — every input was unavailable this run.</p>';
+  summaryEl.textContent=''; return;
+ }
+ const sorted=computeWaterfall(composite.components);
+ summaryEl.textContent=attributionSummary(which, composite.delta, sorted);
+ // trust increase = good (green); tension increase = bad (red) -- fixed per
+ // composite, never derived from raw delta sign alone.
+ const positiveIsGood = which==='trust';
+ const maxAbs = Math.max(...sorted.map(c=>Math.abs(c.delta_contrib)), 0.01);
+ body.innerHTML = sorted.map(c=>{
+  const d=c.delta_contrib, pct=Math.min(100, Math.abs(d)/maxAbs*100);
+  const good = positiveIsGood ? d>0 : d<0;
+  const color = d===0 ? 'var(--frost-dim)' : (good ? 'var(--ok)' : 'var(--blood)');
+  const side = d>=0 ? 'right' : 'left';
+  return `<div class="attr-row">
+    <div class="attr-row-label">${COMPONENT_LABELS[c.id]||c.id}
+      <span class="attr-row-delta" style="color:${color}">${d>0?'+':''}${d}</span></div>
+    <div class="attr-track"><div class="attr-bar" style="background:${color};width:${pct/2}%;${side}:50%"></div></div>
+  </div>`;
+ }).join('');
+}
+
+function openAttribution(which){ $('attrOverlay').hidden=false; renderAttribution(which); }
+function closeAttribution(){ $('attrOverlay').hidden=true; }
+
+for(const [elId,which] of [['dial','trust'],['tensionBar','tension']]){
+ const el=$(elId);
+ el.setAttribute('role','button'); el.setAttribute('tabindex','0');
+ el.setAttribute('aria-label', which==='trust' ? 'View trust attribution' : 'View tension attribution');
+ el.addEventListener('click', ()=>openAttribution(which));
+ el.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openAttribution(which); } });
+}
+$('attrClose').addEventListener('click', closeAttribution);
+$('attrOverlay').addEventListener('click', e=>{ if(e.target.id==='attrOverlay') closeAttribution(); });
+
+document.addEventListener('keydown', e=>{
+ if(e.key!=='Escape') return;
+ if(!$('mechOverlay').hidden) closeMechanics();
+ if(!$('attrOverlay').hidden) closeAttribution();
+ if(!$('journalOverlay').hidden) closeJournal();
+});
 
 /* ---------- threshold notifications ----------
    Spec: fire when tension crosses a threshold band, or when a quarterly
@@ -769,6 +937,251 @@ function checkAndNotify(ledger){
 
 $('alertBtn').addEventListener('click', toggleAlerts);
 updateAlertBtn();
+
+/* ---------- Era Journal (IndexedDB, append-only per spec) ---------- */
+const JOURNAL_DB_NAME='worldledger.journal', JOURNAL_DB_VERSION=1, JOURNAL_STORE='entries';
+let journalDBPromise=null, journalUnavailable=false;
+
+function genId(){ return 'j_'+Date.now()+'_'+Math.random().toString(36).slice(2,8); }
+// NOTE: deliberately not crypto.randomUUID() -- gated to secure contexts and
+// inconsistent across browsers/versions when this file is opened via file://
+// during local dev/testing (no server). Timestamp+random string needs no
+// feature-detection branch and is unique enough for a single-user journal.
+
+function openJournalDB(){
+ return new Promise((resolve,reject)=>{
+  if(!('indexedDB' in window)){ reject(new Error('indexeddb-unsupported')); return; }
+  let req;
+  try{ req=indexedDB.open(JOURNAL_DB_NAME, JOURNAL_DB_VERSION); }catch(e){ reject(e); return; }
+  req.onupgradeneeded=e=>{
+   const db=e.target.result;
+   if(!db.objectStoreNames.contains(JOURNAL_STORE)){
+    const store=db.createObjectStore(JOURNAL_STORE,{keyPath:'id'});
+    store.createIndex('created_at','created_at');
+    store.createIndex('kind','kind');
+   }
+  };
+  req.onsuccess=()=>resolve(req.result);
+  req.onerror=()=>reject(req.error);
+ });
+}
+function getJournalDB(){
+ if(journalUnavailable) return Promise.reject(new Error('journal-unavailable'));
+ if(!journalDBPromise) journalDBPromise=openJournalDB().catch(e=>{ journalUnavailable=true; throw e; });
+ return journalDBPromise;
+}
+
+function snapshotFromLedger(ledger){
+ // flat primitives only, per the spec's snapshot-bloat trap (~2KB/entry target)
+ if(!ledger) return null;
+ const m=ledger.metrics||{};
+ return {
+  sealed_at: ledger.sealed_at ?? null,
+  trust: ledger.composites?.trust?.value ?? null,
+  tension: ledger.composites?.tension?.value ?? null,
+  tension_state: ledger.composites?.tension?.state ?? null,
+  dollar_share: m.dollar_share_gold_incl?.value ?? null,
+  cb_gold_tonnes_4q: m.cb_gold_tonnes_4q?.value ?? null,
+  cross_bloc_penalty: m.cross_bloc_penalty?.value ?? null,
+  gpr_index: m.gpr_index?.value ?? null,
+ };
+}
+
+async function journalAdd({kind, body, resolve_by=null, confidence=null, refers_to_id=null}){
+ const db=await getJournalDB();
+ const entry={
+  id: genId(), created_at: new Date().toISOString(),
+  kind, body, snapshot_json: snapshotFromLedger(currentLedger), // null if ledger not yet loaded -- allowed, form warns inline
+  resolve_by: kind==='prediction' ? resolve_by : null,
+  confidence: kind==='prediction' ? confidence : null,
+  refers_to_id, resolved_at: null, outcome: null, resolution_note: null,
+ };
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction(JOURNAL_STORE,'readwrite');
+  tx.objectStore(JOURNAL_STORE).add(entry);
+  tx.oncomplete=()=>resolve(entry);
+  tx.onerror=()=>reject(tx.error);
+ });
+}
+
+async function journalGetAll(){
+ const db=await getJournalDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction(JOURNAL_STORE,'readonly');
+  const req=tx.objectStore(JOURNAL_STORE).getAll();
+  req.onsuccess=()=>resolve(req.result.sort((a,b)=>b.created_at.localeCompare(a.created_at)));
+  req.onerror=()=>reject(req.error);
+ });
+}
+
+async function journalResolve(id, outcome, note){
+ const db=await getJournalDB();
+ return new Promise((resolve,reject)=>{
+  const tx=db.transaction(JOURNAL_STORE,'readwrite');
+  const store=tx.objectStore(JOURNAL_STORE);
+  const getReq=store.get(id);
+  getReq.onsuccess=()=>{
+   const rec=getReq.result;
+   if(!rec || rec.kind!=='prediction' || rec.resolved_at){ resolve(null); return; }
+   // whitelist -- never touch created_at/kind/body/snapshot_json/resolve_by (append-only rule)
+   const updated={...rec, resolved_at:new Date().toISOString(), outcome, resolution_note:note||null};
+   store.put(updated);
+   tx.oncomplete=()=>resolve(updated);
+  };
+  getReq.onerror=()=>reject(getReq.error);
+ });
+}
+
+const todayISO=()=>new Date().toISOString().slice(0,10);
+function journalDuePredictions(entries){
+ const today=todayISO();
+ return entries.filter(e=>e.kind==='prediction' && !e.resolved_at && e.resolve_by && e.resolve_by<=today);
+}
+function journalDisplaySeq(entries){
+ const asc=[...entries].sort((a,b)=>a.created_at.localeCompare(b.created_at));
+ return new Map(asc.map((e,i)=>[e.id,i+1]));
+}
+function journalCalibration(entries){
+ const buckets={low:{hit:0,miss:0,partial:0}, medium:{hit:0,miss:0,partial:0}, high:{hit:0,miss:0,partial:0}, unset:{hit:0,miss:0,partial:0}};
+ for(const e of entries){
+  if(e.kind!=='prediction' || !e.outcome) continue;
+  const b=buckets[e.confidence||'unset'];
+  if(b) b[e.outcome]=(b[e.outcome]||0)+1;
+ }
+ // hit rate excludes 'partial' from the denominator (per user decision) --
+ // shown as its own count, not blended into the rate at an arbitrary weight.
+ return Object.entries(buckets).map(([confidence,c])=>({
+  confidence, ...c, rate: (c.hit+c.miss)>0 ? (c.hit/(c.hit+c.miss)) : null,
+ }));
+}
+
+function renderJournalDueBanner(due){
+ const el=$('jrnDueBanner');
+ el.innerHTML = due.length
+  ? `<div class="jrn-due-banner">${due.length} prediction${due.length===1?'':'s'} awaiting judgment</div>`
+  : '';
+}
+
+function renderJournalStats(rows){
+ $('jrnStatsBody').innerHTML = rows.map(r=>`<tr>
+  <td>${r.confidence}</td><td>${r.hit}</td><td>${r.miss}</td><td>${r.partial}</td>
+  <td>${r.rate==null?'—':(r.rate*100).toFixed(0)+'%'}</td>
+ </tr>`).join('');
+}
+
+function renderJournalRefersToOptions(entries, seq){
+ const sel=$('jrnRefersTo'), current=sel.value;
+ const asc=[...entries].sort((a,b)=>a.created_at.localeCompare(b.created_at));
+ sel.innerHTML='<option value="">— none —</option>' + asc.map(e=>
+  `<option value="${e.id}">#${seq.get(e.id)} — ${e.kind} — ${e.body.slice(0,40).replace(/</g,'&lt;')}</option>`
+ ).join('');
+ sel.value=current;
+}
+
+function journalEntryHTML(e, seq){
+ const overdue = e.kind==='prediction' && !e.resolved_at && e.resolve_by && e.resolve_by<=todayISO();
+ const kindClass = `kind-${e.kind}` + (overdue?' overdue':'');
+ const snap = e.snapshot_json
+  ? `Trust ${e.snapshot_json.trust ?? '—'} · Tension ${e.snapshot_json.tension ?? '—'} (${e.snapshot_json.tension_state ?? '—'})`
+  : 'no snapshot';
+ const refers = e.refers_to_id && seq.has(e.refers_to_id) ? `<div class="jrn-refers">→ refers to #${seq.get(e.refers_to_id)}</div>` : '';
+ let resolveBlock='';
+ if(e.kind==='prediction'){
+  if(e.resolved_at){
+   resolveBlock = `<div class="jrn-resolve"><span class="jrn-kind-badge ${e.outcome}">${e.outcome}</span>${e.resolution_note?` <span class="jrn-body">${e.resolution_note.replace(/</g,'&lt;')}</span>`:''}</div>`;
+  }else if(overdue){
+   resolveBlock = `<div class="jrn-resolve">
+    <input type="text" class="jrn-input jrn-resolve-note" placeholder="note (optional)" style="flex:1;min-width:120px">
+    <button class="jrn-resolve-btn hit" data-resolve="${e.id}" data-outcome="hit">Hit</button>
+    <button class="jrn-resolve-btn miss" data-resolve="${e.id}" data-outcome="miss">Miss</button>
+    <button class="jrn-resolve-btn partial" data-resolve="${e.id}" data-outcome="partial">Partial</button>
+   </div>`;
+  }else{
+   resolveBlock = `<div class="jrn-snapshot">Resolves ${e.resolve_by}${e.confidence?` · confidence: ${e.confidence}`:''}</div>`;
+  }
+ }
+ return `<div class="jrn-entry ${kindClass}">
+  <div class="jrn-entry-head"><span class="jrn-kind-badge ${e.kind}">${e.kind}</span>#${seq.get(e.id)} · ${e.created_at.slice(0,10)}</div>
+  <div class="jrn-body">${e.body.replace(/</g,'&lt;')}</div>
+  <div class="jrn-snapshot">${snap}</div>
+  ${refers}
+  ${resolveBlock}
+ </div>`;
+}
+
+function renderJournalList(entries, seq){
+ $('jrnList').innerHTML = entries.length
+  ? entries.map(e=>journalEntryHTML(e,seq)).join('')
+  : '<p class="attr-empty">No entries yet.</p>';
+ $('jrnList').querySelectorAll('[data-resolve]').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+   const noteEl=btn.closest('.jrn-resolve').querySelector('.jrn-resolve-note');
+   handleJournalResolve(btn.dataset.resolve, btn.dataset.outcome, noteEl);
+  });
+ });
+}
+
+function renderJournalPanel(){
+ journalGetAll().then(entries=>{
+  const seq=journalDisplaySeq(entries);
+  renderJournalDueBanner(journalDuePredictions(entries));
+  renderJournalList(entries, seq);
+  renderJournalStats(journalCalibration(entries));
+  renderJournalRefersToOptions(entries, seq);
+  $('jrnSnapshotWarning').hidden = !!currentLedger;
+ }).catch(()=>{
+  $('journalBody').innerHTML='<button class="mech-close" id="journalClose2">Close ✕</button><h2>Era Journal</h2><p class="attr-empty">Journal storage isn\'t available in this browser (private browsing or storage disabled). Entries won\'t be saved.</p>';
+  const c=$('journalClose2'); if(c) c.addEventListener('click', closeJournal);
+ });
+}
+
+async function handleJournalSubmit(e){
+ e.preventDefault();
+ const f=e.target, kind=f.kind.value;
+ await journalAdd({
+  kind, body:f.body.value.trim(),
+  resolve_by: kind==='prediction' ? f.resolve_by.value : null,
+  confidence: kind==='prediction' ? (f.confidence.value||null) : null,
+  refers_to_id: f.refers_to_id.value || null,
+ });
+ f.reset(); $('jrnPredictFields').hidden=true; renderJournalPanel(); updateJournalBtn();
+}
+async function handleJournalResolve(id, outcome, noteInputEl){
+ await journalResolve(id, outcome, noteInputEl?.value?.trim()||null);
+ renderJournalPanel(); updateJournalBtn();
+}
+function openJournal(){ $('journalOverlay').hidden=false; renderJournalPanel(); }
+function closeJournal(){ $('journalOverlay').hidden=true; }
+function updateJournalBtn(){
+ journalGetAll().then(entries=>{
+  const n=journalDuePredictions(entries).length;
+  $('journalBtn').textContent = n>0 ? `JOURNAL (${n} DUE)` : 'JOURNAL';
+ }).catch(()=>{ $('journalBtn').textContent='JOURNAL'; });
+}
+
+function downloadBlob(blob, filename){
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a'); a.href=url; a.download=filename;
+ document.body.appendChild(a); a.click(); a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url), 1000);
+}
+function exportJournalJSON(entries){ downloadBlob(new Blob([JSON.stringify(entries,null,2)],{type:'application/json'}), `world-ledger-journal-${todayISO()}.json`); }
+function entryToMarkdown(e){
+ const snap=e.snapshot_json ? `Trust ${e.snapshot_json.trust ?? '—'} · Tension ${e.snapshot_json.tension ?? '—'} (${e.snapshot_json.tension_state ?? '—'})` : 'no snapshot';
+ const res=e.resolved_at ? `\n\n**Resolution:** ${e.outcome}${e.resolution_note?' — '+e.resolution_note:''}` : '';
+ return `### [${e.kind}] ${e.created_at}\n\n${e.body}\n\n> ${snap}${res}`;
+}
+function exportJournalMarkdown(entries){ downloadBlob(new Blob([entries.map(entryToMarkdown).join('\n\n---\n\n')],{type:'text/markdown'}), `world-ledger-journal-${todayISO()}.md`); }
+
+$('jrnKind').addEventListener('change', e=>{ $('jrnPredictFields').hidden = e.target.value!=='prediction'; });
+$('jrnForm').addEventListener('submit', handleJournalSubmit);
+$('jrnExportJSON').addEventListener('click', ()=>journalGetAll().then(exportJournalJSON));
+$('jrnExportMD').addEventListener('click', ()=>journalGetAll().then(exportJournalMarkdown));
+$('journalBtn').addEventListener('click', openJournal);
+$('journalClose').addEventListener('click', closeJournal);
+$('journalOverlay').addEventListener('click', e=>{ if(e.target.id==='journalOverlay') closeJournal(); });
+
+updateJournalBtn();
 
 init();
 </script>
