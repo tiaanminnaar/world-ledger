@@ -211,6 +211,7 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
   text-underline-offset:2px;
 }
 .mech-link:hover{color:var(--frost-bright)}
+.mech-link.on{color:var(--ok)}
 .mech-overlay{
   position:fixed;inset:0;z-index:100;background:rgba(3,5,9,.85);
   display:flex;align-items:flex-start;justify-content:center;
@@ -275,7 +276,7 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
   <div class="datestamp">
     <span id="sealedLabel">RECORD SEALED</span> · <b id="sealedDate">—</b><br>
     <span id="feedState">LOADING LEDGER…</span><br>
-    OBSERVER STATION · NONALIGNED SOUTH · <button id="mechBtn" class="mech-link">MECHANICS</button>
+    OBSERVER STATION · NONALIGNED SOUTH · <button id="mechBtn" class="mech-link">MECHANICS</button> · <button id="alertBtn" class="mech-link">ALERTS: OFF</button>
   </div>
 </header>
 
@@ -652,6 +653,7 @@ async function init(){
   renderTimeline();
   setEra(curEra);
   renderMechanicsTable();
+  checkAndNotify(ledger);
  }catch(e){
   console.error('could not load live ledger', e);
  }
@@ -705,6 +707,68 @@ $('mechBtn').addEventListener('click', openMechanics);
 $('mechClose').addEventListener('click', closeMechanics);
 $('mechOverlay').addEventListener('click', e=>{ if(e.target.id==='mechOverlay') closeMechanics(); });
 document.addEventListener('keydown', e=>{ if(e.key==='Escape' && !$('mechOverlay').hidden) closeMechanics(); });
+
+/* ---------- threshold notifications ----------
+   Spec: fire when tension crosses a threshold band, or when a quarterly
+   source publishes a new value -- one notification per event, never per
+   fetch. State is compared against the last-seen record in localStorage
+   so a fetch that changes nothing stays silent. */
+const NOTIF_STATE_KEY='worldledger.notifState.v1';
+const QUARTERLY_WATCH={
+ dollar_share_gold_incl:{label:'Dollar share (gold-incl.)', fmt:v=>pct(v)},
+ cofer_usd_share_of_allocated:{label:'COFER USD share', fmt:v=>pct(v)},
+ cb_gold_tonnes_4q:{label:'Central-bank gold demand', fmt:v=>v.toLocaleString('en-US')+'t'},
+};
+
+function tensionBand(t){ const st=T_STATES.find(x=>t<x[0]); return st ? st[1] : 'Rupture'; }
+function notifSupported(){ return typeof Notification!=='undefined'; }
+function notifEnabled(){ return notifSupported() && Notification.permission==='granted'; }
+
+function fireNotification(title,body){
+ if(!notifEnabled()) return;
+ try{ new Notification(title,{body}); }catch(e){ console.warn('notification failed',e); }
+}
+
+function updateAlertBtn(){
+ const btn=$('alertBtn');
+ if(!notifSupported()){ btn.textContent='ALERTS: UNSUPPORTED'; btn.disabled=true; return; }
+ if(Notification.permission==='granted'){ btn.textContent='ALERTS: ON'; btn.classList.add('on'); }
+ else if(Notification.permission==='denied'){ btn.textContent='ALERTS: BLOCKED'; btn.classList.remove('on'); }
+ else { btn.textContent='ALERTS: OFF'; btn.classList.remove('on'); }
+}
+
+async function toggleAlerts(){
+ if(!notifSupported()) return;
+ if(Notification.permission==='default') await Notification.requestPermission();
+ updateAlertBtn();
+}
+
+function checkAndNotify(ledger){
+ const tension=ledger.composites?.tension?.value;
+ const band=tension!=null ? tensionBand(tension) : null;
+ let stored=null;
+ try{ stored=JSON.parse(localStorage.getItem(NOTIF_STATE_KEY)||'null'); }catch(e){}
+
+ const next={band, quarterlies:{}};
+ for(const key of Object.keys(QUARTERLY_WATCH)) next.quarterlies[key]=ledger.metrics?.[key]?.as_of || null;
+
+ if(stored){
+  if(band && stored.band && band!==stored.band){
+   fireNotification('World Ledger — tension shift', `Geopolitical tension moved ${stored.band} → ${band} (${tension})`);
+  }
+  for(const [key,cfg] of Object.entries(QUARTERLY_WATCH)){
+   const prevAsOf=stored.quarterlies?.[key], curAsOf=next.quarterlies[key], m=ledger.metrics?.[key];
+   if(prevAsOf && curAsOf && curAsOf!==prevAsOf && m && typeof m.value==='number'){
+    fireNotification('World Ledger — record sealed', `${cfg.label} sealed for ${curAsOf}: ${cfg.fmt(m.value)}`);
+   }
+  }
+ }
+ // first-ever run just establishes the baseline silently -- no notification, avoids noise on first load
+ localStorage.setItem(NOTIF_STATE_KEY, JSON.stringify(next));
+}
+
+$('alertBtn').addEventListener('click', toggleAlerts);
+updateAlertBtn();
 
 init();
 </script>
