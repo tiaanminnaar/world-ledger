@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-07-27T06:58:21Z",
+  "sealed_at": "2026-07-27T08:06:00Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -37,7 +37,7 @@
       ]
     },
     "tension": {
-      "value": 33.0,
+      "value": 33.1,
       "state": "Strain",
       "delta": 0.0,
       "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty",
@@ -52,8 +52,8 @@
         {
           "id": "gdelt",
           "weight": 0.25,
-          "norm": 0.5448,
-          "contribution": 13.62,
+          "norm": 0.5488,
+          "contribution": 13.72,
           "delta_contrib": 0.0
         },
         {
@@ -79,7 +79,7 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4100.1,
+      "value": 4096.2,
       "as_of": "2026-07-27",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4745.6,
+      "gold": 4741.1,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4194,
+      "value": 0.4195,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -127,10 +127,10 @@
       "stale": false
     },
     "gdelt_conflict_tone_30d": {
-      "value": -2.358,
-      "as_of": "2026-07-25",
+      "value": -2.39,
+      "as_of": "2026-07-27",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
-      "stale": true
+      "stale": false
     }
   },
   "blocs": {
@@ -177,5 +177,47 @@
       "tension_bump": 14,
       "desc": "The middle tilts to the challenger. The costliest path modelled: -3.7% of world welfare. The incumbent financial system loses its periphery, and the two halves stop sharing anything worth protecting."
     }
-  ]
+  ],
+  "observer": {
+    "usdzar": {
+      "rate": 16.8501,
+      "vol_30d": 0.0067,
+      "as_of": "2026-07-24",
+      "source": "frankfurter.app (ECB reference rates)",
+      "stale": false
+    },
+    "export_split": {
+      "west": 0.4003,
+      "east": 0.1895,
+      "africa": 0.0772,
+      "other": 0.333,
+      "as_of": "2025",
+      "source": "UN Comtrade (South Africa exports by partner, annual)",
+      "stale": false
+    },
+    "sarb": {
+      "repo": 0.07,
+      "repo_as_of": "2026-07-24",
+      "source": "SARB WebIndicators (CurrentMarketRates)",
+      "stale": false,
+      "reserves_usd_bn": 63.1,
+      "reserves_as_of": "2026-Q2",
+      "reserves_source": "editorial (SARB gold and foreign exchange reserves notices, published monthly as PDF -- no live API)",
+      "reserves_editorial": true
+    },
+    "status": [
+      {
+        "id": "agoa",
+        "state": "active",
+        "note": "AGOA preferential access remains in force but under periodic review -- a lapse would hit SA's auto and agricultural export lines hardest.",
+        "editorial": true
+      },
+      {
+        "id": "brics",
+        "state": "expanding",
+        "note": "BRICS+ enlargement continues to add members and payment-rail experiments, but a common settlement currency remains further off than the bloc's own rhetoric suggests.",
+        "editorial": true
+      }
+    ]
+  }
 }

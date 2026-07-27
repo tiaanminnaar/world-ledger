@@ -32,11 +32,34 @@ this harvester makes exactly one call per run so that's never an issue):
        query over the trailing 30 days; we average the daily points into
        one gdelt_conflict_tone_30d figure, per the spec's "always aggregate
        over windows, never react to single events" warning.
+
+Observer Station (the view from the nonaligned South) request shapes:
+  https://api.frankfurter.app/{30-days-ago}..?from=USD&to=ZAR
+    -> daily USD/ZAR rate series (ECB reference rates); latest value + a
+       30-day realised volatility (stdev of daily log returns).
+  https://comtradeapi.un.org/public/v1/preview/C/A/HS?reporterCode=710&
+    period={year}&cmdCode=TOTAL&flowCode=X
+    -> South Africa's (reporterCode 710) exports by partner, no API key
+       needed on the free "preview" tier. Filter to motCode=0 (all modes
+       combined, isAggregate=true) to get one row per partner rather than
+       a mode-of-transport breakdown -- the unfiltered response can hit
+       the free tier's 500-record/call cap and silently truncate.
+  https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json
+    -> static reference mapping Comtrade's numeric partnerCode to ISO3,
+       used with blocs.json to classify each partner as west/east/
+       africa/other for the export-split composite.
+  https://custom.resbank.co.za/SarbWebApi/WebIndicators/CurrentMarketRates
+    -> SARB's live policy (repo) rate, among other market rates. No clean
+       API exists for gold/FX reserves (published as monthly PDF notices
+       only) -- that figure stays editorial, same treatment as WGC gold
+       demand.
 """
 import json
+import math
 import re
+import statistics
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pandas as pd
@@ -48,6 +71,7 @@ LEDGER_PATH = ROOT / "ledger.json"
 HISTORY_DIR = ROOT / "history"
 EDITORIAL_PATH = ROOT / "editorial" / "editorial.json"
 BASELINE_PATH = HARVESTER_DIR / "baseline_config.json"
+BLOCS_PATH = HARVESTER_DIR / "blocs.json"
 
 GPR_URL = "https://www.matteoiacoviello.com/gpr_files/data_gpr_export.xls"
 GOLD_URL = "https://query1.finance.yahoo.com/v8/finance/chart/GC=F?range=5d&interval=1d"
@@ -57,6 +81,22 @@ COFER_SHARE_URL = f"{COFER_BASE}.CI_USD.SHRO_PT.Q"
 COFER_TOTAL_URL = f"{COFER_BASE}.CI_T.NV_USD.Q"
 GDELT_URL = "https://api.gdeltproject.org/api/v2/doc/doc"
 GDELT_QUERY = '(sanctions OR tariff OR "trade war" OR geopolitical OR conflict)'
+FX_URL = "https://api.frankfurter.app"
+COMTRADE_URL = "https://comtradeapi.un.org/public/v1/preview/C/A/HS"
+COMTRADE_PARTNERS_URL = "https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json"
+SA_REPORTER_CODE = "710"
+SARB_URL = "https://custom.resbank.co.za/SarbWebApi/WebIndicators/CurrentMarketRates"
+
+# UN-recognised African states (ISO3) -- a fixed geographic fact, unlike the
+# west/east bloc alignment in blocs.json which is an editorial judgment call.
+AFRICA_ISO3 = {
+    "DZA", "AGO", "BEN", "BWA", "BFA", "BDI", "CPV", "CMR", "CAF", "TCD",
+    "COM", "COG", "COD", "CIV", "DJI", "EGY", "GNQ", "ERI", "SWZ", "ETH",
+    "GAB", "GMB", "GHA", "GIN", "GNB", "KEN", "LSO", "LBR", "LBY", "MDG",
+    "MWI", "MLI", "MRT", "MUS", "MAR", "MOZ", "NAM", "NER", "NGA", "RWA",
+    "STP", "SEN", "SYC", "SLE", "SOM", "ZAF", "SSD", "SDN", "TZA", "TGO",
+    "TUN", "UGA", "ZMB", "ZWE",
+}
 
 HEADERS = {"User-Agent": "Mozilla/5.0 (world-ledger harvester; personal project)"}
 OZ_PER_TONNE = 32150.7466
@@ -68,6 +108,7 @@ MONTHS = {m: i for i, m in enumerate(
 MAX_JUMP = {
     "gpr_index": 2.5, "gold_price_usd_oz": 0.15, "tic_foreign_holdings_usd_bn": 0.20,
     "cofer_usd_share_of_allocated": 0.15, "cofer_allocated_total_usd_bn": 0.15,
+    "usdzar_rate": 0.15, "sarb_repo_rate": 0.30,
 }
 # GDELT tone oscillates close to zero, where a percentage-jump gate is
 # unstable (small denominators inflate trivial swings) -- use an absolute
@@ -265,6 +306,125 @@ def fetch_gdelt(prev_metrics):
         return None  # no GDELT ever fetched yet -- tension falls back to renormalised weights
 
 
+def fetch_fx(prev_observer):
+    """USD/ZAR via frankfurter.app: latest rate + 30-day realised volatility
+    (stdev of daily log returns). Takes the previous ledger's own "observer"
+    sub-dict directly rather than the metrics dict the other sanity checks
+    use -- Observer Station lives at the ledger's top level, not in metrics."""
+    prev = (prev_observer or {}).get("usdzar", {})
+    try:
+        start = (datetime.now(timezone.utc) - timedelta(days=35)).strftime("%Y-%m-%d")
+        resp = requests.get(f"{FX_URL}/{start}..", headers=HEADERS, timeout=20,
+                             params={"from": "USD", "to": "ZAR"})
+        resp.raise_for_status()
+        rates = resp.json()["rates"]
+        dates = sorted(rates.keys())
+        series = [rates[d]["ZAR"] for d in dates]
+        latest_rate, as_of = series[-1], dates[-1]
+
+        prev_rate = prev.get("rate")
+        if prev_rate and abs(latest_rate - prev_rate) / abs(prev_rate) > MAX_JUMP["usdzar_rate"]:
+            print(f"[warn] usdzar_rate jumped {prev_rate} -> {latest_rate} -- rejecting, marking stale", file=sys.stderr)
+            raise ValueError("failed sanity gate")
+
+        log_returns = [math.log(series[i] / series[i - 1]) for i in range(1, len(series)) if series[i - 1]]
+        vol_30d = round(statistics.pstdev(log_returns), 4) if len(log_returns) > 1 else None
+
+        return {"rate": round(latest_rate, 4), "vol_30d": vol_30d, "as_of": as_of,
+                "source": "frankfurter.app (ECB reference rates)", "stale": False}
+    except Exception as e:
+        print(f"[warn] FX fetch failed: {e}", file=sys.stderr)
+        if prev:
+            return {**prev, "stale": True}
+        return None  # no FX ever fetched yet
+
+
+def fetch_comtrade(prev_observer, blocs):
+    """South Africa's exports by partner (UN Comtrade free "preview" tier,
+    no key needed), classified into west/east/africa/other via blocs.json +
+    AFRICA_ISO3. Comtrade releases lag real time -- try the current year,
+    fall back a year or two if that year has no data published yet."""
+    prev = (prev_observer or {}).get("export_split", {})
+    try:
+        partners_resp = requests.get(COMTRADE_PARTNERS_URL, headers=HEADERS, timeout=30)
+        partners_resp.raise_for_status()
+        code_to_iso3 = {str(r["PartnerCode"]): r.get("PartnerCodeIsoAlpha3")
+                        for r in partners_resp.json()["results"]}
+
+        this_year = datetime.now(timezone.utc).year
+        rows, used_year = None, None
+        for year in (this_year, this_year - 1, this_year - 2):
+            resp = requests.get(COMTRADE_URL, headers=HEADERS, timeout=30, params={
+                "reporterCode": SA_REPORTER_CODE, "period": str(year),
+                "cmdCode": "TOTAL", "flowCode": "X",
+            })
+            resp.raise_for_status()
+            # motCode 0 = all modes of transport combined (isAggregate) --
+            # one row per partner. The unfiltered response mixes in a
+            # per-mode-of-transport breakdown and can hit the free tier's
+            # 500-record cap.
+            candidate = [r for r in resp.json().get("data", [])
+                         if r.get("motCode") == 0 and r.get("partnerCode") != 0]
+            if candidate:
+                rows, used_year = candidate, year
+                break
+        if not rows:
+            raise ValueError("no Comtrade data for recent years")
+
+        totals = {"west": 0.0, "east": 0.0, "africa": 0.0, "other": 0.0}
+        grand_total = 0.0
+        for row in rows:
+            value = row.get("primaryValue") or 0.0
+            iso3 = code_to_iso3.get(str(row["partnerCode"]))
+            grand_total += value
+            if iso3 in blocs.get("west", []):
+                totals["west"] += value
+            elif iso3 in blocs.get("east", []):
+                totals["east"] += value
+            elif iso3 in AFRICA_ISO3:
+                totals["africa"] += value
+            else:
+                totals["other"] += value
+        if not grand_total:
+            raise ValueError("zero grand total")
+
+        shares = {k: round(v / grand_total, 4) for k, v in totals.items()}
+        shares.update({"as_of": str(used_year),
+                        "source": "UN Comtrade (South Africa exports by partner, annual)",
+                        "stale": False})
+        return shares
+    except Exception as e:
+        print(f"[warn] Comtrade fetch failed: {e}", file=sys.stderr)
+        if prev:
+            return {**prev, "stale": True}
+        return None  # no Comtrade data ever fetched yet
+
+
+def fetch_sarb(prev_observer):
+    """SARB policy (repo) rate -- live via WebIndicators/CurrentMarketRates.
+    Gold/FX reserves have no equivalent clean API (monthly PDF notices
+    only), so that figure is merged in from editorial.json by the caller."""
+    prev = (prev_observer or {}).get("sarb", {})
+    try:
+        resp = requests.get(SARB_URL, headers=HEADERS, timeout=20)
+        resp.raise_for_status()
+        repo_row = next(r for r in resp.json() if r.get("Name") == "SARB Policy Rate")
+        repo_rate, as_of = repo_row["Value"] / 100, repo_row["Date"]
+
+        prev_repo = prev.get("repo")
+        if prev_repo and abs(repo_rate - prev_repo) / abs(prev_repo) > MAX_JUMP["sarb_repo_rate"]:
+            print(f"[warn] sarb_repo_rate jumped {prev_repo} -> {repo_rate} -- rejecting, marking stale", file=sys.stderr)
+            raise ValueError("failed sanity gate")
+
+        return {"repo": round(repo_rate, 4), "repo_as_of": as_of,
+                "source": "SARB WebIndicators (CurrentMarketRates)", "stale": False}
+    except Exception as e:
+        print(f"[warn] SARB fetch failed: {e}", file=sys.stderr)
+        if prev:
+            return {**prev, "stale": True}
+        return None  # no SARB rate ever fetched yet
+
+
 def norm(x, lo, hi):
     if x is None:
         return None
@@ -320,15 +480,20 @@ def tension_state(t):
 def main():
     prev = load_previous_ledger()
     prev_metrics = prev["metrics"] if prev else {}
+    prev_observer = prev.get("observer", {}) if prev else {}
 
     editorial = json.loads(EDITORIAL_PATH.read_text(encoding="utf-8"))
     baseline = json.loads(BASELINE_PATH.read_text(encoding="utf-8"))
+    blocs = json.loads(BLOCS_PATH.read_text(encoding="utf-8"))
 
     gpr = fetch_gpr(prev_metrics)
     gold = fetch_gold(prev_metrics)
     tic = fetch_tic(prev_metrics)
     cofer = fetch_cofer(prev_metrics)
     gdelt = fetch_gdelt(prev_metrics)
+    fx = fetch_fx(prev_observer)
+    export_split = fetch_comtrade(prev_observer, blocs)
+    sarb_live = fetch_sarb(prev_observer)
 
     gpr_baseline_min = gpr["gpr_baseline_min"] if gpr["gpr_baseline_min"] is not None else None
     gpr_baseline_max = gpr["gpr_baseline_max"] if gpr["gpr_baseline_max"] is not None else None
@@ -398,6 +563,25 @@ def main():
     trust_components = with_delta_contrib(trust_components, prev_trust_components)
     tension_components = with_delta_contrib(tension_components, prev_tension_components)
 
+    # ---- Observer Station: the view from the nonaligned South ----
+    ed_observer = editorial.get("observer", {})
+    observer = {}
+    if fx is not None:
+        observer["usdzar"] = fx
+    if export_split is not None:
+        observer["export_split"] = export_split
+    sarb_block = dict(sarb_live) if sarb_live is not None else {}
+    reserves = ed_observer.get("reserves_usd_bn")
+    if reserves is not None:
+        sarb_block["reserves_usd_bn"] = reserves["value"]
+        sarb_block["reserves_as_of"] = reserves["as_of"]
+        sarb_block["reserves_source"] = reserves["source"]
+        sarb_block["reserves_editorial"] = True
+    if sarb_block:
+        observer["sarb"] = sarb_block
+    if ed_observer.get("status"):
+        observer["status"] = ed_observer["status"]
+
     ledger = {
         "sealed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "schema_version": 1,
@@ -430,6 +614,7 @@ def main():
         "blocs": editorial["blocs"],
         "dispatch": editorial["dispatch"],
         "scenarios": editorial["scenarios"],
+        "observer": observer,
     }
 
     LEDGER_PATH.write_text(json.dumps(ledger, indent=2, ensure_ascii=False), encoding="utf-8")

@@ -1,0 +1,13 @@
+{
+  "_comment": "Editorial artifact per the Observer Station spec: maps ISO3 country codes to west/east bloc alignment for classifying South Africa's export partners. Everything not listed defaults to nonaligned, then split into africa/other by continent (see AFRICA_ISO3 in pipeline.py, a fixed geographic fact rather than a political judgment call). This file IS a political judgment call -- version it, and note in a journal entry if a country is ever reclassified, since that rewrites the export_split history series.",
+  "as_of": "2026-Q2",
+  "west": [
+    "USA", "GBR", "DEU", "FRA", "ITA", "ESP", "NLD", "BEL", "LUX", "CAN",
+    "AUS", "NZL", "JPN", "KOR", "CHE", "SWE", "NOR", "DNK", "FIN", "ISL",
+    "AUT", "IRL", "PRT", "GRC", "POL", "CZE", "SVK", "HUN", "ROU", "BGR",
+    "HRV", "SVN", "EST", "LVA", "LTU", "ISR"
+  ],
+  "east": [
+    "CHN", "RUS", "PRK", "BLR", "IRN"
+  ]
+}

@@ -311,6 +311,34 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
 .jrn-refers{font-size:10px;color:var(--frost-dim);margin-top:4px}
 .jrn-export{margin:6px 0 10px;font-size:11px}
 
+/* ---------- observer station ---------- */
+.observer-grid{display:grid;grid-template-columns:1fr 1.4fr 1fr;gap:24px;margin-top:4px}
+@media(max-width:980px){.observer-grid{grid-template-columns:1fr}}
+.observer-col .label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--frost-dim);margin-bottom:6px}
+.seismo-wrap{margin-top:16px}
+.seismo-label{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--frost-dim);margin-bottom:5px}
+.seismo-bar{height:10px;background:#0a0f17;border:1px solid var(--hairline);position:relative;overflow:hidden}
+.seismo-fill{height:100%;width:0%;background:linear-gradient(90deg,var(--frost-dim),var(--heat) 70%,var(--ember));transition:width 1.2s ease;box-shadow:0 0 8px rgba(224,160,61,.4)}
+.split-bar{display:flex;height:22px;background:#0a0f17;border:1px solid var(--hairline);overflow:hidden;clip-path:polygon(8px 0,100% 0,calc(100% - 8px) 100%,0 100%)}
+.split-seg{height:100%;transition:width 1.2s ease}
+.split-seg.west{background:var(--frost)}
+.split-seg.east{background:var(--ember)}
+.split-seg.africa{background:var(--heat)}
+.split-seg.other{background:var(--frost-dim)}
+.split-legend{display:flex;flex-wrap:wrap;gap:12px;margin-top:8px;font-size:10px;letter-spacing:.06em}
+.split-legend span{display:flex;align-items:center;gap:5px;color:var(--frost-dim)}
+.split-legend i{width:9px;height:9px;display:inline-block}
+.split-legend i.west{background:var(--frost)}
+.split-legend i.east{background:var(--ember)}
+.split-legend i.africa{background:var(--heat)}
+.split-legend i.other{background:var(--frost-dim)}
+.status-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-top:18px}
+.status-card{background:#0a0f17;border:1px solid var(--hairline);padding:12px 14px;clip-path:polygon(8px 0,100% 0,100% calc(100% - 8px),calc(100% - 8px) 100%,0 100%,0 8px)}
+.status-card-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.status-card-id{font-family:'Oswald',sans-serif;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--frost-bright)}
+.status-card-state{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor;color:var(--heat)}
+.status-card-note{font-size:11px;color:var(--frost-dim);line-height:1.6}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -438,6 +466,52 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
     <div class="big" id="wNum">—</div>
     <div class="lbl">Projected world welfare loss<br>under selected path</div>
   </div>
+</div>
+
+<!-- observer station -->
+<div class="panel" style="margin-bottom:18px">
+  <h2>Observer Station — Nonaligned South</h2>
+  <div class="observer-grid">
+    <div class="observer-col">
+      <div class="label">USD / ZAR</div>
+      <div class="value" id="obsFx">—</div>
+      <div class="note" id="obsFxAsOf">—</div>
+      <div class="seismo-wrap">
+        <div class="seismo-label">Rand volatility (30d)</div>
+        <div class="seismo-bar"><div class="seismo-fill" id="obsVolFill"></div></div>
+        <div class="note" id="obsVolNote">—</div>
+      </div>
+    </div>
+    <div class="observer-col">
+      <div class="label">Export split — where SA's trade actually settles</div>
+      <div class="split-bar" id="obsSplitBar">
+        <div class="split-seg west" id="segWest" style="width:0%"></div>
+        <div class="split-seg east" id="segEast" style="width:0%"></div>
+        <div class="split-seg africa" id="segAfrica" style="width:0%"></div>
+        <div class="split-seg other" id="segOther" style="width:0%"></div>
+      </div>
+      <div class="split-legend">
+        <span><i class="west"></i>West <b id="lblWest">—</b></span>
+        <span><i class="east"></i>East <b id="lblEast">—</b></span>
+        <span><i class="africa"></i>Africa <b id="lblAfrica">—</b></span>
+        <span><i class="other"></i>Other <b id="lblOther">—</b></span>
+      </div>
+      <div class="note" id="obsSplitAsOf">—</div>
+    </div>
+    <div class="observer-col">
+      <div class="stat">
+        <div class="label">SARB repo rate</div>
+        <div class="value" id="obsRepo">—</div>
+        <div class="note" id="obsRepoAsOf">—</div>
+      </div>
+      <div class="stat" style="margin-top:8px">
+        <div class="label">Gold &amp; FX reserves</div>
+        <div class="value" id="obsReserves">—</div>
+        <div class="note" id="obsReservesAsOf">—</div>
+      </div>
+    </div>
+  </div>
+  <div class="status-cards" id="obsStatus"></div>
 </div>
 
 <footer>
@@ -745,6 +819,7 @@ async function init(){
   setEra(curEra);
   renderMechanicsTable();
   checkAndNotify(ledger);
+  renderObserver(ledger);
  }catch(e){
   console.error('could not load live ledger', e);
  }
@@ -790,6 +865,51 @@ function renderMechanicsTable(){
   return `<tr><td>${label}</td><td class="mv">${value}</td><td>${asOf}</td><td>${badge}</td><td>${m.source||m.note||'—'}</td></tr>`;
  });
  body.innerHTML = rows.length ? rows.join('') : '<tr><td colspan="5">No metrics in this record.</td></tr>';
+}
+
+/* ---------- observer station ---------- */
+function renderObserver(ledger){
+ const obs = ledger?.observer || {};
+
+ const fx = obs.usdzar;
+ $('obsFx').textContent = fx ? `R ${fx.rate.toFixed(2)}` : '—';
+ $('obsFxAsOf').textContent = fx ? `As of ${fx.as_of}${fx.stale?' · stale':''}` : 'Not available this record';
+ const vol = fx?.vol_30d;
+ $('obsVolFill').style.width = vol!=null ? Math.min(100, vol/0.03*100)+'%' : '0%';
+ $('obsVolNote').textContent = vol!=null ? `${(vol*100).toFixed(2)}% daily stdev of log returns` : '—';
+
+ const split = obs.export_split;
+ if(split){
+  $('segWest').style.width=(split.west*100)+'%';
+  $('segEast').style.width=(split.east*100)+'%';
+  $('segAfrica').style.width=(split.africa*100)+'%';
+  $('segOther').style.width=(split.other*100)+'%';
+  $('lblWest').textContent=pct(split.west);
+  $('lblEast').textContent=pct(split.east);
+  $('lblAfrica').textContent=pct(split.africa);
+  $('lblOther').textContent=pct(split.other);
+  $('obsSplitAsOf').textContent = `${split.source||'UN Comtrade'} · ${split.as_of}${split.stale?' · stale':''}`;
+ }else{
+  ['segWest','segEast','segAfrica','segOther'].forEach(id=>$(id).style.width='0%');
+  ['lblWest','lblEast','lblAfrica','lblOther'].forEach(id=>$(id).textContent='—');
+  $('obsSplitAsOf').textContent='Not available this record';
+ }
+
+ const sarb = obs.sarb;
+ $('obsRepo').textContent = sarb?.repo!=null ? pct(sarb.repo) : '—';
+ $('obsRepoAsOf').textContent = sarb?.repo_as_of ? `As of ${sarb.repo_as_of}${sarb.stale?' · stale':''}` : '—';
+ $('obsReserves').textContent = sarb?.reserves_usd_bn!=null ? `$${sarb.reserves_usd_bn.toFixed(1)}bn` : '—';
+ $('obsReservesAsOf').textContent = sarb?.reserves_as_of ? `As of ${sarb.reserves_as_of}${sarb.reserves_editorial?' · editorial':''}` : '—';
+
+ const status = obs.status || [];
+ $('obsStatus').innerHTML = status.length ? status.map(s=>`
+  <div class="status-card">
+   <div class="status-card-head">
+    <span class="status-card-id">${(s.id||'').toUpperCase()}</span>
+    <span class="status-card-state">${s.state||'—'}</span>
+   </div>
+   <div class="status-card-note">${(s.note||'').replace(/</g,'&lt;')}</div>
+  </div>`).join('') : '';
 }
 
 function openMechanics(){ $('mechOverlay').hidden=false; renderMechanicsTable(); }

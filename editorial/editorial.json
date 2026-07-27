@@ -13,6 +13,13 @@
     "nonaligned": { "cohesion": 70, "note": "Two-thirds of world trade now runs through value chains being actively reshaped. The middle is now the system's remaining shock absorber." }
   },
   "dispatch": "The storm arrives not as one blow but as a thousand small closures, each with its own constituency sworn to keep it shut. Gold in the vaults now outweighs the paper promises. Below half — for the first time, the city asks what holds the generator up.",
+  "observer": {
+    "reserves_usd_bn": { "value": 63.1, "as_of": "2026-Q2", "source": "editorial (SARB gold and foreign exchange reserves notices, published monthly as PDF -- no live API)" },
+    "status": [
+      { "id": "agoa", "state": "active", "note": "AGOA preferential access remains in force but under periodic review -- a lapse would hit SA's auto and agricultural export lines hardest.", "editorial": true },
+      { "id": "brics", "state": "expanding", "note": "BRICS+ enlargement continues to add members and payment-rail experiments, but a common settlement currency remains further off than the bloc's own rhetoric suggests.", "editorial": true }
+    ]
+  },
   "scenarios": [
     { "id": "managed", "nm": "Managed Equilibrium", "welfare": -0.019, "tension_bump": 0,
       "desc": "The blocs settle into a cold but stable two-system world. Incomplete fragmentation costs -1.9% of world welfare — the intra/inter-bloc gap holds at its step-change rather than spiralling. The middle stays unclaimed, and keeps the two halves connected." },
