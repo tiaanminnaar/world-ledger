@@ -86,6 +86,16 @@ COMTRADE_URL = "https://comtradeapi.un.org/public/v1/preview/C/A/HS"
 COMTRADE_PARTNERS_URL = "https://comtradeapi.un.org/files/v1/app/reference/partnerAreas.json"
 SA_REPORTER_CODE = "710"
 SARB_URL = "https://custom.resbank.co.za/SarbWebApi/WebIndicators/CurrentMarketRates"
+PORTWATCH_URL = "https://services9.arcgis.com/weJ1QsnbMYJlCHdG/ArcGIS/rest/services/Daily_Chokepoints_Data/FeatureServer/0/query"
+# id -> (ArcGIS portid, display name, lat, lon) -- lat/lon used client-side to
+# place each chokepoint on the minimal route map.
+CHOKEPOINTS = {
+    "panama":       ("chokepoint2", "Panama Canal", 9.08, -79.68),
+    "suez":         ("chokepoint1", "Suez Canal", 30.5, 32.35),
+    "bab_el_mandeb": ("chokepoint4", "Bab el-Mandeb Strait", 12.6, 43.4),
+    "hormuz":       ("chokepoint6", "Strait of Hormuz", 26.6, 56.25),
+    "malacca":      ("chokepoint5", "Malacca Strait", 2.5, 101.4),
+}
 
 # UN-recognised African states (ISO3) -- a fixed geographic fact, unlike the
 # west/east bloc alignment in blocs.json which is an editorial judgment call.
@@ -425,6 +435,77 @@ def fetch_sarb(prev_observer):
         return None  # no SARB rate ever fetched yet
 
 
+def _portwatch_query(portid, where_extra):
+    """ArcGIS feature service query for one chokepoint. maxRecordCount on
+    this service is 1000 -- querying per-chokepoint (up to ~365 rows for a
+    full-year baseline pull) stays well under that without needing
+    resultOffset pagination. Returns (date_str, n_total) tuples, sorted
+    ascending by date."""
+    resp = requests.get(PORTWATCH_URL, headers=HEADERS, timeout=30, params={
+        "where": f"portid='{portid}' AND {where_extra}",
+        "outFields": "date,n_total",
+        "orderByFields": "date ASC",
+        "resultRecordCount": 1000,
+        "f": "json",
+    })
+    resp.raise_for_status()
+    return [(r["attributes"]["date"], r["attributes"]["n_total"])
+            for r in resp.json().get("features", []) if r["attributes"]["n_total"] is not None]
+
+
+def fetch_portwatch(prev_observer):
+    """IMF PortWatch (ArcGIS feature service, no key needed) -- daily vessel
+    transit counts for 5 named chokepoints. The feed runs on a real lag
+    (observed ~8 days during development) so every window here is anchored
+    to the latest date actually present in the data, never to "today" --
+    a fixed-offset-from-today approach silently starves trend_30d of data
+    whenever the lag grows past the window size.
+    transits_7d is the trailing 7-day average ending on the latest
+    available date; trend_30d compares that to the 7-day window ending
+    ~30 days before that same date; vs_baseline compares it to the
+    chokepoint's own 2019 daily average -- the first full year in the
+    dataset (which starts 2019-01-01), i.e. the last complete pre-COVID
+    year, per the spec's "pre-2020 baseline" intent."""
+    prev = (prev_observer or {}).get("supply_lines", {})
+    try:
+        today = datetime.now(timezone.utc).date()
+        window_start = (today - timedelta(days=55)).isoformat()
+        chokepoints = []
+        for cid, (portid, name, lat, lon) in CHOKEPOINTS.items():
+            recent = _portwatch_query(portid, f"date >= '{window_start}'")
+            baseline = _portwatch_query(portid, "date >= '2019-01-01' AND date < '2020-01-01'")
+            if len(recent) < 7 or not baseline:
+                raise ValueError(f"insufficient PortWatch data for {portid}")
+
+            latest_date = datetime.strptime(recent[-1][0][:10], "%Y-%m-%d").date()
+            recent_vals = [n for _, n in recent]
+            transits_7d = round(statistics.mean(recent_vals[-7:]), 1)
+
+            baseline_avg = statistics.mean(n for _, n in baseline)
+            vs_baseline = round(transits_7d / baseline_avg, 3) if baseline_avg else None
+
+            target_end = latest_date - timedelta(days=30)
+            older_window = [n for d, n in recent
+                             if datetime.strptime(d[:10], "%Y-%m-%d").date() <= target_end][-7:]
+            trend_30d = None
+            if len(older_window) == 7:
+                older_7d = statistics.mean(older_window)
+                if older_7d:
+                    trend_30d = round((transits_7d - older_7d) / older_7d, 3)
+
+            chokepoints.append({"id": cid, "name": name, "lat": lat, "lon": lon,
+                                 "as_of": latest_date.isoformat(), "transits_7d": transits_7d,
+                                 "vs_baseline": vs_baseline, "trend_30d": trend_30d})
+
+        return {"chokepoints": chokepoints, "as_of": today.isoformat(),
+                "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)", "stale": False}
+    except Exception as e:
+        print(f"[warn] PortWatch fetch failed: {e}", file=sys.stderr)
+        if prev.get("chokepoints"):
+            return {**prev, "stale": True}
+        return None  # no PortWatch data ever fetched yet
+
+
 def norm(x, lo, hi):
     if x is None:
         return None
@@ -494,6 +575,7 @@ def main():
     fx = fetch_fx(prev_observer)
     export_split = fetch_comtrade(prev_observer, blocs)
     sarb_live = fetch_sarb(prev_observer)
+    supply_lines = fetch_portwatch(prev_observer)
 
     gpr_baseline_min = gpr["gpr_baseline_min"] if gpr["gpr_baseline_min"] is not None else None
     gpr_baseline_max = gpr["gpr_baseline_max"] if gpr["gpr_baseline_max"] is not None else None
@@ -582,6 +664,13 @@ def main():
     if ed_observer.get("status"):
         observer["status"] = ed_observer["status"]
 
+    # ---- Physical Layer: supply lines ----
+    ed_physical = editorial.get("physical", {})
+    supply_lines_block = dict(supply_lines) if supply_lines is not None else {}
+    freight = ed_physical.get("freight_wci_usd")
+    if freight is not None:
+        supply_lines_block["freight_wci_usd"] = {**freight, "editorial": True}
+
     ledger = {
         "sealed_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "schema_version": 1,
@@ -615,6 +704,7 @@ def main():
         "dispatch": editorial["dispatch"],
         "scenarios": editorial["scenarios"],
         "observer": observer,
+        "supply_lines": supply_lines_block,
     }
 
     LEDGER_PATH.write_text(json.dumps(ledger, indent=2, ensure_ascii=False), encoding="utf-8")

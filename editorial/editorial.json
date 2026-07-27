@@ -20,6 +20,9 @@
       { "id": "brics", "state": "expanding", "note": "BRICS+ enlargement continues to add members and payment-rail experiments, but a common settlement currency remains further off than the bloc's own rhetoric suggests.", "editorial": true }
     ]
   },
+  "physical": {
+    "freight_wci_usd": { "value": 3120, "as_of": "2026-07-20", "source": "editorial (Drewry World Container Index, weekly headline figure -- no free bulk API, hand-entered)" }
+  },
   "scenarios": [
     { "id": "managed", "nm": "Managed Equilibrium", "welfare": -0.019, "tension_bump": 0,
       "desc": "The blocs settle into a cold but stable two-system world. Incomplete fragmentation costs -1.9% of world welfare — the intra/inter-bloc gap holds at its step-change rather than spiralling. The middle stays unclaimed, and keeps the two halves connected." },

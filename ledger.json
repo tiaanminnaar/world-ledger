@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-07-27T08:06:00Z",
+  "sealed_at": "2026-07-27T09:46:07Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -79,7 +79,7 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4096.2,
+      "value": 4094.7,
       "as_of": "2026-07-27",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4741.1,
+      "gold": 4739.3,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4195,
+      "value": 0.4196,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -130,7 +130,7 @@
       "value": -2.39,
       "as_of": "2026-07-27",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
-      "stale": false
+      "stale": true
     }
   },
   "blocs": {
@@ -193,11 +193,11 @@
       "other": 0.333,
       "as_of": "2025",
       "source": "UN Comtrade (South Africa exports by partner, annual)",
-      "stale": false
+      "stale": true
     },
     "sarb": {
       "repo": 0.07,
-      "repo_as_of": "2026-07-24",
+      "repo_as_of": "2026-07-27",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
@@ -219,5 +219,68 @@
         "editorial": true
       }
     ]
+  },
+  "supply_lines": {
+    "chokepoints": [
+      {
+        "id": "panama",
+        "name": "Panama Canal",
+        "lat": 9.08,
+        "lon": -79.68,
+        "as_of": "2026-07-19",
+        "transits_7d": 38,
+        "vs_baseline": 1.194,
+        "trend_30d": 0.43
+      },
+      {
+        "id": "suez",
+        "name": "Suez Canal",
+        "lat": 30.5,
+        "lon": 32.35,
+        "as_of": "2026-07-19",
+        "transits_7d": 41.6,
+        "vs_baseline": 0.795,
+        "trend_30d": 0.142
+      },
+      {
+        "id": "bab_el_mandeb",
+        "name": "Bab el-Mandeb Strait",
+        "lat": 12.6,
+        "lon": 43.4,
+        "as_of": "2026-07-19",
+        "transits_7d": 40.1,
+        "vs_baseline": 0.759,
+        "trend_30d": 0.118
+      },
+      {
+        "id": "hormuz",
+        "name": "Strait of Hormuz",
+        "lat": 26.6,
+        "lon": 56.25,
+        "as_of": "2026-07-19",
+        "transits_7d": 12.1,
+        "vs_baseline": 0.163,
+        "trend_30d": 0.02
+      },
+      {
+        "id": "malacca",
+        "name": "Malacca Strait",
+        "lat": 2.5,
+        "lon": 101.4,
+        "as_of": "2026-07-19",
+        "transits_7d": 215,
+        "vs_baseline": 1.269,
+        "trend_30d": -0.008
+      }
+    ],
+    "as_of": "2026-07-27",
+    "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
+    "stale": false,
+    "freight_wci_usd": {
+      "value": 3120,
+      "as_of": "2026-07-20",
+      "source": "editorial (Drewry World Container Index, weekly headline figure -- no free bulk API, hand-entered)",
+      "editorial": true
+    }
   }
 }

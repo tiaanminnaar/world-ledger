@@ -339,6 +339,21 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
 .status-card-state{font-size:9px;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border:1px solid currentColor;color:var(--heat)}
 .status-card-note{font-size:11px;color:var(--frost-dim);line-height:1.6}
 
+/* ---------- supply lines / route map ---------- */
+.route-map{width:100%;height:auto;background:#050810;border:1px solid var(--hairline);display:block}
+.route-grid-line{stroke:rgba(168,216,232,.06);stroke-width:1}
+.route-line{transition:stroke .8s ease,stroke-width .8s ease}
+.route-node{transition:fill .8s ease}
+.route-node-glow{opacity:.3}
+.route-label{font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.05em;fill:var(--frost-dim)}
+.route-label-value{font-family:'Oswald',sans-serif;font-size:11px;font-weight:500}
+.route-legend{display:flex;flex-wrap:wrap;gap:16px;margin-top:10px;font-size:10px;letter-spacing:.06em;color:var(--frost-dim)}
+.route-legend span{display:flex;align-items:center;gap:6px}
+.rl-swatch{width:14px;height:3px;display:inline-block}
+.rl-swatch.healthy{background:var(--frost)}
+.rl-swatch.strained{background:var(--heat)}
+.rl-swatch.degraded{background:var(--ember)}
+
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
@@ -512,6 +527,22 @@ footer{margin-top:26px;border-top:1px solid var(--hairline);padding-top:12px;fon
     </div>
   </div>
   <div class="status-cards" id="obsStatus"></div>
+</div>
+
+<!-- physical layer / supply lines -->
+<div class="panel" style="margin-bottom:18px">
+  <h2>Supply Lines — Frostland Routes</h2>
+  <svg id="routeMap" class="route-map" viewBox="0 0 800 400" aria-label="Chokepoint transit route map"></svg>
+  <div class="route-legend">
+    <span><i class="rl-swatch healthy"></i>At/above 2019 baseline</span>
+    <span><i class="rl-swatch strained"></i>Strained</span>
+    <span><i class="rl-swatch degraded"></i>Degraded</span>
+  </div>
+  <div class="stat" style="margin-top:12px">
+    <div class="label">Container freight rate (Drewry WCI)</div>
+    <div class="value" id="freightWci">—</div>
+    <div class="note" id="freightWciAsOf">—</div>
+  </div>
 </div>
 
 <footer>
@@ -820,6 +851,7 @@ async function init(){
   renderMechanicsTable();
   checkAndNotify(ledger);
   renderObserver(ledger);
+  renderSupplyLines(ledger);
  }catch(e){
   console.error('could not load live ledger', e);
  }
@@ -910,6 +942,79 @@ function renderObserver(ledger){
    </div>
    <div class="status-card-note">${(s.note||'').replace(/</g,'&lt;')}</div>
   </div>`).join('') : '';
+}
+
+/* ---------- supply lines / route map ---------- */
+const ROUTE_ORDER=['panama','suez','bab_el_mandeb','hormuz','malacca'];
+// Suez/Bab el-Mandeb/Hormuz sit close together geographically and their
+// labels crowd/overlap under a generic hemisphere-based rule -- fixed
+// per-point placement (direction, distance, short label) keeps all 5
+// legible instead of trying to auto-avoid collisions.
+const ROUTE_LABELS={
+ panama:        {short:'PANAMA',       dir:1,  dist:22},
+ suez:          {short:'SUEZ',         dir:-1, dist:34},
+ bab_el_mandeb: {short:'BAB EL-MANDEB', dir:1,  dist:34},
+ hormuz:        {short:'HORMUZ',       dir:-1, dist:16},
+ malacca:       {short:'MALACCA',      dir:1,  dist:22},
+};
+
+function projectLatLon(lat,lon,w,h){
+ return {x:(lon+180)/360*w, y:(90-lat)/180*h};
+}
+
+function chokepointColor(vsBaseline){
+ if(vsBaseline==null) return 'var(--frost-dim)';
+ if(vsBaseline>=0.85) return 'var(--frost)';
+ if(vsBaseline>=0.6) return 'var(--heat)';
+ return 'var(--ember)';
+}
+
+function renderSupplyLines(ledger){
+ const sl=ledger?.supply_lines;
+ const svg=$('routeMap');
+ const W=800,H=400;
+ if(!sl || !sl.chokepoints?.length){
+  svg.innerHTML=`<text x="${W/2}" y="${H/2}" text-anchor="middle" class="route-label">No chokepoint data in this record.</text>`;
+  $('freightWci').textContent='—'; $('freightWciAsOf').textContent='—';
+  return;
+ }
+ const byId=Object.fromEntries(sl.chokepoints.map(c=>[c.id,c]));
+ const pts=ROUTE_ORDER.filter(id=>byId[id]).map(id=>({...byId[id], ...projectLatLon(byId[id].lat,byId[id].lon,W,H)}));
+
+ let svgContent='';
+ for(let lon=-180; lon<=180; lon+=30){
+  const x=projectLatLon(0,lon,W,H).x;
+  svgContent+=`<line x1="${x}" y1="0" x2="${x}" y2="${H}" class="route-grid-line"/>`;
+ }
+ for(let lat=-60; lat<=60; lat+=30){
+  const y=projectLatLon(lat,0,W,H).y;
+  svgContent+=`<line x1="0" y1="${y}" x2="${W}" y2="${y}" class="route-grid-line"/>`;
+ }
+ for(let i=0;i<pts.length-1;i++){
+  const a=pts[i], b=pts[i+1];
+  const avgVs=(a.vs_baseline!=null && b.vs_baseline!=null) ? (a.vs_baseline+b.vs_baseline)/2 : null;
+  const width=avgVs!=null ? Math.max(1,Math.min(6,avgVs*4)) : 1.5;
+  svgContent+=`<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="route-line" stroke="${chokepointColor(avgVs)}" stroke-width="${width}" opacity="0.7"/>`;
+ }
+ pts.forEach(p=>{
+  const color=chokepointColor(p.vs_baseline);
+  const r=5+(p.vs_baseline!=null ? Math.min(6,p.vs_baseline*4) : 3);
+  const cfg=ROUTE_LABELS[p.id]||{short:p.name,dir:1,dist:22};
+  const labelY=p.y + cfg.dir*cfg.dist;
+  svgContent+=`
+   <circle cx="${p.x}" cy="${p.y}" r="${r+6}" fill="${color}" class="route-node-glow"/>
+   <circle cx="${p.x}" cy="${p.y}" r="${r}" fill="${color}" class="route-node"/>
+   <text x="${p.x}" y="${labelY}" text-anchor="middle" class="route-label">${cfg.short}</text>
+   <text x="${p.x}" y="${labelY + cfg.dir*12}" text-anchor="middle" class="route-label-value" fill="${color}">${p.vs_baseline!=null?(p.vs_baseline*100).toFixed(0)+'%':'—'}</text>
+  `;
+ });
+ svg.innerHTML=svgContent;
+
+ const freight=sl.freight_wci_usd;
+ $('freightWci').textContent = freight?.value!=null ? `$${freight.value.toLocaleString('en-US')}` : '—';
+ $('freightWciAsOf').textContent = freight
+  ? `As of ${freight.as_of}${freight.editorial?' · editorial':''}`
+  : 'Not available this record';
 }
 
 function openMechanics(){ $('mechOverlay').hidden=false; renderMechanicsTable(); }
