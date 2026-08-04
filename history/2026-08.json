@@ -1,10 +1,10 @@
 {
-  "sealed_at": "2026-08-03T06:55:14Z",
+  "sealed_at": "2026-08-04T06:23:30Z",
   "schema_version": 1,
   "composites": {
     "trust": {
-      "value": 33.5,
-      "delta": 0.0,
+      "value": 33.4,
+      "delta": -0.1,
       "components": [
         {
           "id": "dollar_share",
@@ -30,24 +30,24 @@
         {
           "id": "gpr_12m",
           "weight": 0.1,
-          "norm": 0.7323,
-          "contribution": 7.32,
-          "delta_contrib": 0.0
+          "norm": 0.7284,
+          "contribution": 7.28,
+          "delta_contrib": -0.04
         }
       ]
     },
     "tension": {
-      "value": 33.1,
+      "value": 30.6,
       "state": "Strain",
-      "delta": 0.0,
+      "delta": -2.5,
       "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty",
       "components": [
         {
           "id": "gpr_monthly",
           "weight": 0.55,
-          "norm": 0.2751,
-          "contribution": 15.13,
-          "delta_contrib": 0.0
+          "norm": 0.2302,
+          "contribution": 12.66,
+          "delta_contrib": -2.47
         },
         {
           "id": "gdelt",
@@ -68,19 +68,19 @@
   },
   "metrics": {
     "gpr_index": {
-      "value": 173.64,
-      "as_of": "2026-06",
+      "value": 152.67,
+      "as_of": "2026-07",
       "source": "Caldara & Iacoviello GPR",
       "stale": false
     },
     "gpr_index_12m_avg": {
-      "value": 170.2,
-      "as_of": "2026-06",
+      "value": 172.01,
+      "as_of": "2026-07",
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4120.9,
-      "as_of": "2026-08-03",
+      "value": 4119.9,
+      "as_of": "2026-08-04",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,7 +91,7 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4769.6,
+      "gold": 4768.5,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.575,
-      "vol_30d": 0.0069,
-      "as_of": "2026-07-31",
+      "rate": 16.4698,
+      "vol_30d": 0.007,
+      "as_of": "2026-08-03",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -193,11 +193,11 @@
       "other": 0.333,
       "as_of": "2025",
       "source": "UN Comtrade (South Africa exports by partner, annual)",
-      "stale": true
+      "stale": false
     },
     "sarb": {
       "repo": 0.07,
-      "repo_as_of": "2026-07-31",
+      "repo_as_of": "2026-08-03",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
@@ -273,7 +273,7 @@
         "trend_30d": -0.046
       }
     ],
-    "as_of": "2026-08-03",
+    "as_of": "2026-08-04",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
