@@ -1,10 +1,10 @@
 {
-  "sealed_at": "2026-08-04T06:23:30Z",
+  "sealed_at": "2026-08-05T06:23:34Z",
   "schema_version": 1,
   "composites": {
     "trust": {
       "value": 33.4,
-      "delta": -0.1,
+      "delta": 0.0,
       "components": [
         {
           "id": "dollar_share",
@@ -32,14 +32,14 @@
           "weight": 0.1,
           "norm": 0.7284,
           "contribution": 7.28,
-          "delta_contrib": -0.04
+          "delta_contrib": 0.0
         }
       ]
     },
     "tension": {
       "value": 30.6,
       "state": "Strain",
-      "delta": -2.5,
+      "delta": 0.0,
       "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty",
       "components": [
         {
@@ -47,7 +47,7 @@
           "weight": 0.55,
           "norm": 0.2302,
           "contribution": 12.66,
-          "delta_contrib": -2.47
+          "delta_contrib": 0.0
         },
         {
           "id": "gdelt",
@@ -79,8 +79,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4119.9,
-      "as_of": "2026-08-04",
+      "value": 4232.5,
+      "as_of": "2026-08-05",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4768.5,
+      "gold": 4898.8,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4189,
+      "value": 0.4158,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.4698,
+      "rate": 16.4408,
       "vol_30d": 0.007,
-      "as_of": "2026-08-03",
+      "as_of": "2026-08-04",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -193,11 +193,11 @@
       "other": 0.333,
       "as_of": "2025",
       "source": "UN Comtrade (South Africa exports by partner, annual)",
-      "stale": false
+      "stale": true
     },
     "sarb": {
       "repo": 0.07,
-      "repo_as_of": "2026-08-03",
+      "repo_as_of": "2026-08-04",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
@@ -227,53 +227,53 @@
         "name": "Panama Canal",
         "lat": 9.08,
         "lon": -79.68,
-        "as_of": "2026-07-26",
-        "transits_7d": 27.9,
-        "vs_baseline": 0.876,
-        "trend_30d": -0.155
+        "as_of": "2026-08-02",
+        "transits_7d": 30.4,
+        "vs_baseline": 0.955,
+        "trend_30d": -0.063
       },
       {
         "id": "suez",
         "name": "Suez Canal",
         "lat": 30.5,
         "lon": 32.35,
-        "as_of": "2026-07-26",
-        "transits_7d": 40.9,
-        "vs_baseline": 0.781,
-        "trend_30d": -0.055
+        "as_of": "2026-08-02",
+        "transits_7d": 40.7,
+        "vs_baseline": 0.778,
+        "trend_30d": -0.021
       },
       {
         "id": "bab_el_mandeb",
         "name": "Bab el-Mandeb Strait",
         "lat": 12.6,
         "lon": 43.4,
-        "as_of": "2026-07-26",
-        "transits_7d": 28.1,
-        "vs_baseline": 0.532,
-        "trend_30d": -0.223
+        "as_of": "2026-08-02",
+        "transits_7d": 29.7,
+        "vs_baseline": 0.562,
+        "trend_30d": -0.141
       },
       {
         "id": "hormuz",
         "name": "Strait of Hormuz",
         "lat": 26.6,
         "lon": 56.25,
-        "as_of": "2026-07-23",
-        "transits_7d": 11.1,
-        "vs_baseline": 0.149,
-        "trend_30d": -0.312
+        "as_of": "2026-08-02",
+        "transits_7d": 3.9,
+        "vs_baseline": 0.062,
+        "trend_30d": -0.816
       },
       {
         "id": "malacca",
         "name": "Malacca Strait",
         "lat": 2.5,
         "lon": 101.4,
-        "as_of": "2026-07-26",
-        "transits_7d": 224.1,
-        "vs_baseline": 1.323,
-        "trend_30d": -0.046
+        "as_of": "2026-08-02",
+        "transits_7d": 223.7,
+        "vs_baseline": 1.32,
+        "trend_30d": -0.002
       }
     ],
-    "as_of": "2026-08-04",
+    "as_of": "2026-08-05",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
