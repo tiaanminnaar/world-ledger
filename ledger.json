@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-08-05T06:23:34Z",
+  "sealed_at": "2026-08-06T06:25:19Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -79,8 +79,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4232.5,
-      "as_of": "2026-08-05",
+      "value": 4320.4,
+      "as_of": "2026-08-06",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4898.8,
+      "gold": 5000.5,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4158,
+      "value": 0.4135,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.4408,
+      "rate": 16.3466,
       "vol_30d": 0.007,
-      "as_of": "2026-08-04",
+      "as_of": "2026-08-05",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -197,7 +197,7 @@
     },
     "sarb": {
       "repo": 0.07,
-      "repo_as_of": "2026-08-04",
+      "repo_as_of": "2026-08-05",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
@@ -273,7 +273,7 @@
         "trend_30d": -0.002
       }
     ],
-    "as_of": "2026-08-05",
+    "as_of": "2026-08-06",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
