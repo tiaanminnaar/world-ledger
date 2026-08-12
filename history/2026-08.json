@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-08-11T05:03:17Z",
+  "sealed_at": "2026-08-12T05:27:31Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -52,9 +52,9 @@
         {
           "id": "gdelt",
           "weight": 0.25,
-          "norm": 0.5465,
-          "contribution": 13.66,
-          "delta_contrib": -0.06
+          "norm": 0.5475,
+          "contribution": 13.69,
+          "delta_contrib": 0.03
         },
         {
           "id": "cross_bloc_penalty",
@@ -82,7 +82,7 @@
       "value": 4467.6,
       "as_of": "2026-08-11",
       "source": "Yahoo Finance COMEX GC=F",
-      "stale": false
+      "stale": true
     },
     "tic_foreign_holdings_usd_bn": {
       "value": 7402.5,
@@ -127,8 +127,8 @@
       "stale": false
     },
     "gdelt_conflict_tone_30d": {
-      "value": -2.372,
-      "as_of": "2026-08-11",
+      "value": -2.38,
+      "as_of": "2026-08-12",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
       "stale": false
     }
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.1772,
-      "vol_30d": 0.0068,
-      "as_of": "2026-08-10",
+      "rate": 16.179,
+      "vol_30d": 0.0066,
+      "as_of": "2026-08-11",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -193,11 +193,11 @@
       "other": 0.333,
       "as_of": "2025",
       "source": "UN Comtrade (South Africa exports by partner, annual)",
-      "stale": false
+      "stale": true
     },
     "sarb": {
       "repo": 0.07,
-      "repo_as_of": "2026-08-07",
+      "repo_as_of": "2026-08-11",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
@@ -227,53 +227,53 @@
         "name": "Panama Canal",
         "lat": 9.08,
         "lon": -79.68,
-        "as_of": "2026-08-02",
-        "transits_7d": 30.4,
-        "vs_baseline": 0.955,
-        "trend_30d": -0.063
+        "as_of": "2026-08-09",
+        "transits_7d": 30,
+        "vs_baseline": 0.942,
+        "trend_30d": -0.032
       },
       {
         "id": "suez",
         "name": "Suez Canal",
         "lat": 30.5,
         "lon": 32.35,
-        "as_of": "2026-08-02",
-        "transits_7d": 40.7,
-        "vs_baseline": 0.778,
-        "trend_30d": -0.021
+        "as_of": "2026-08-09",
+        "transits_7d": 40.9,
+        "vs_baseline": 0.781,
+        "trend_30d": -0.006
       },
       {
         "id": "bab_el_mandeb",
         "name": "Bab el-Mandeb Strait",
         "lat": 12.6,
         "lon": 43.4,
-        "as_of": "2026-08-02",
-        "transits_7d": 29.7,
-        "vs_baseline": 0.562,
-        "trend_30d": -0.141
+        "as_of": "2026-08-09",
+        "transits_7d": 25.1,
+        "vs_baseline": 0.475,
+        "trend_30d": -0.147
       },
       {
         "id": "hormuz",
         "name": "Strait of Hormuz",
         "lat": 26.6,
         "lon": 56.25,
-        "as_of": "2026-08-02",
-        "transits_7d": 3.9,
-        "vs_baseline": 0.062,
-        "trend_30d": -0.816
+        "as_of": "2026-08-09",
+        "transits_7d": 4.4,
+        "vs_baseline": 0.07,
+        "trend_30d": -0.704
       },
       {
         "id": "malacca",
         "name": "Malacca Strait",
         "lat": 2.5,
         "lon": 101.4,
-        "as_of": "2026-08-02",
-        "transits_7d": 223.7,
-        "vs_baseline": 1.32,
-        "trend_30d": -0.002
+        "as_of": "2026-08-09",
+        "transits_7d": 216.3,
+        "vs_baseline": 1.277,
+        "trend_30d": -0.06
       }
     ],
-    "as_of": "2026-08-11",
+    "as_of": "2026-08-12",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
