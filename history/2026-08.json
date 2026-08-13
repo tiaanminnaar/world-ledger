@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-08-12T05:27:31Z",
+  "sealed_at": "2026-08-13T05:37:10Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -52,9 +52,9 @@
         {
           "id": "gdelt",
           "weight": 0.25,
-          "norm": 0.5475,
-          "contribution": 13.69,
-          "delta_contrib": 0.03
+          "norm": 0.5456,
+          "contribution": 13.64,
+          "delta_contrib": -0.05
         },
         {
           "id": "cross_bloc_penalty",
@@ -79,10 +79,10 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4467.6,
-      "as_of": "2026-08-11",
+      "value": 4462.9,
+      "as_of": "2026-08-13",
       "source": "Yahoo Finance COMEX GC=F",
-      "stale": true
+      "stale": false
     },
     "tic_foreign_holdings_usd_bn": {
       "value": 7402.5,
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 5170.9,
+      "gold": 5165.5,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4097,
+      "value": 0.4098,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -127,8 +127,8 @@
       "stale": false
     },
     "gdelt_conflict_tone_30d": {
-      "value": -2.38,
-      "as_of": "2026-08-12",
+      "value": -2.365,
+      "as_of": "2026-08-13",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
       "stale": false
     }
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.179,
+      "rate": 16.1343,
       "vol_30d": 0.0066,
-      "as_of": "2026-08-11",
+      "as_of": "2026-08-12",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -197,7 +197,7 @@
     },
     "sarb": {
       "repo": 0.07,
-      "repo_as_of": "2026-08-11",
+      "repo_as_of": "2026-08-12",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
@@ -273,7 +273,7 @@
         "trend_30d": -0.06
       }
     ],
-    "as_of": "2026-08-12",
+    "as_of": "2026-08-13",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
