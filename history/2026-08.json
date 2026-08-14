@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-08-13T05:37:10Z",
+  "sealed_at": "2026-08-14T05:28:29Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -54,7 +54,7 @@
           "weight": 0.25,
           "norm": 0.5456,
           "contribution": 13.64,
-          "delta_contrib": -0.05
+          "delta_contrib": 0.0
         },
         {
           "id": "cross_bloc_penalty",
@@ -79,8 +79,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4462.9,
-      "as_of": "2026-08-13",
+      "value": 4374.0,
+      "as_of": "2026-08-14",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 5165.5,
+      "gold": 5062.6,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4098,
+      "value": 0.4121,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -130,7 +130,7 @@
       "value": -2.365,
       "as_of": "2026-08-13",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
-      "stale": false
+      "stale": true
     }
   },
   "blocs": {
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.1343,
+      "rate": 16.1188,
       "vol_30d": 0.0066,
-      "as_of": "2026-08-12",
+      "as_of": "2026-08-13",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -197,7 +197,7 @@
     },
     "sarb": {
       "repo": 0.07,
-      "repo_as_of": "2026-08-12",
+      "repo_as_of": "2026-08-13",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
@@ -273,7 +273,7 @@
         "trend_30d": -0.06
       }
     ],
-    "as_of": "2026-08-13",
+    "as_of": "2026-08-14",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
