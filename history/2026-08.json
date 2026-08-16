@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-08-15T04:24:05Z",
+  "sealed_at": "2026-08-16T04:30:22Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -52,9 +52,9 @@
         {
           "id": "gdelt",
           "weight": 0.25,
-          "norm": 0.5456,
-          "contribution": 13.64,
-          "delta_contrib": 0.0
+          "norm": 0.5471,
+          "contribution": 13.68,
+          "delta_contrib": 0.04
         },
         {
           "id": "cross_bloc_penalty",
@@ -79,7 +79,7 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4432.0,
+      "value": 4437.3,
       "as_of": "2026-08-14",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 5129.7,
+      "gold": 5135.9,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4106,
+      "value": 0.4104,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -127,10 +127,10 @@
       "stale": false
     },
     "gdelt_conflict_tone_30d": {
-      "value": -2.365,
-      "as_of": "2026-08-13",
+      "value": -2.377,
+      "as_of": "2026-08-16",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
-      "stale": true
+      "stale": false
     }
   },
   "blocs": {
@@ -273,7 +273,7 @@
         "trend_30d": -0.06
       }
     ],
-    "as_of": "2026-08-15",
+    "as_of": "2026-08-16",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
