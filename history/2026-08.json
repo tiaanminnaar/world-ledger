@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-08-16T04:30:22Z",
+  "sealed_at": "2026-08-17T04:35:55Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -54,7 +54,7 @@
           "weight": 0.25,
           "norm": 0.5471,
           "contribution": 13.68,
-          "delta_contrib": 0.04
+          "delta_contrib": 0.0
         },
         {
           "id": "cross_bloc_penalty",
@@ -79,8 +79,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4437.3,
-      "as_of": "2026-08-14",
+      "value": 4450.2,
+      "as_of": "2026-08-17",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 5135.9,
+      "gold": 5150.8,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4104,
+      "value": 0.4101,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -130,7 +130,7 @@
       "value": -2.377,
       "as_of": "2026-08-16",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
-      "stale": false
+      "stale": true
     }
   },
   "blocs": {
@@ -181,7 +181,7 @@
   "observer": {
     "usdzar": {
       "rate": 16.1648,
-      "vol_30d": 0.0065,
+      "vol_30d": 0.0066,
       "as_of": "2026-08-14",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
@@ -193,7 +193,7 @@
       "other": 0.333,
       "as_of": "2025",
       "source": "UN Comtrade (South Africa exports by partner, annual)",
-      "stale": true
+      "stale": false
     },
     "sarb": {
       "repo": 0.07,
@@ -273,7 +273,7 @@
         "trend_30d": -0.06
       }
     ],
-    "as_of": "2026-08-16",
+    "as_of": "2026-08-17",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
