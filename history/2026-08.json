@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-08-19T04:31:49Z",
+  "sealed_at": "2026-08-20T04:32:19Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -39,7 +39,7 @@
     "tension": {
       "value": 30.5,
       "state": "Strain",
-      "delta": -0.1,
+      "delta": 0.0,
       "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty",
       "components": [
         {
@@ -54,7 +54,7 @@
           "weight": 0.25,
           "norm": 0.5431,
           "contribution": 13.58,
-          "delta_contrib": -0.1
+          "delta_contrib": 0.0
         },
         {
           "id": "cross_bloc_penalty",
@@ -79,8 +79,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4404.3,
-      "as_of": "2026-08-19",
+      "value": 4552.8,
+      "as_of": "2026-08-20",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 5097.7,
+      "gold": 5269.5,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4113,
+      "value": 0.4075,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -130,7 +130,7 @@
       "value": -2.345,
       "as_of": "2026-08-19",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
-      "stale": false
+      "stale": true
     }
   },
   "blocs": {
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.2196,
+      "rate": 16.2443,
       "vol_30d": 0.0064,
-      "as_of": "2026-08-18",
+      "as_of": "2026-08-19",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -193,11 +193,11 @@
       "other": 0.333,
       "as_of": "2025",
       "source": "UN Comtrade (South Africa exports by partner, annual)",
-      "stale": false
+      "stale": true
     },
     "sarb": {
       "repo": 0.07,
-      "repo_as_of": "2026-08-18",
+      "repo_as_of": "2026-08-19",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
@@ -273,7 +273,7 @@
         "trend_30d": -0.065
       }
     ],
-    "as_of": "2026-08-19",
+    "as_of": "2026-08-20",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
