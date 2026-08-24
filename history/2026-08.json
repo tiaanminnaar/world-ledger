@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-08-23T04:31:30Z",
+  "sealed_at": "2026-08-24T04:39:34Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -79,8 +79,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4680.6,
-      "as_of": "2026-08-21",
+      "value": 4696.5,
+      "as_of": "2026-08-24",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,16 +91,16 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 5417.5,
+      "gold": 5435.9,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4042,
+      "value": 0.4038,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
-      "stale": false
+      "stale": true
     },
     "cb_gold_tonnes_4q": {
       "value": 1043,
@@ -118,13 +118,13 @@
       "value": 0.5713,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated reserves, USD share)",
-      "stale": false
+      "stale": true
     },
     "cofer_allocated_total_usd_bn": {
       "value": 13104.9,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated reserves, all currencies, nominal USD)",
-      "stale": false
+      "stale": true
     },
     "gdelt_conflict_tone_30d": {
       "value": -2.345,
@@ -181,7 +181,7 @@
   "observer": {
     "usdzar": {
       "rate": 16.0044,
-      "vol_30d": 0.0064,
+      "vol_30d": 0.0065,
       "as_of": "2026-08-21",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
@@ -273,7 +273,7 @@
         "trend_30d": -0.065
       }
     ],
-    "as_of": "2026-08-23",
+    "as_of": "2026-08-24",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
