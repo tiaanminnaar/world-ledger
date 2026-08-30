@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-08-29T10:40:40Z",
+  "sealed_at": "2026-08-30T09:40:57Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -273,7 +273,7 @@
         "trend_30d": -0.055
       }
     ],
-    "as_of": "2026-08-29",
+    "as_of": "2026-08-30",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
