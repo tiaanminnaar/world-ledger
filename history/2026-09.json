@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-09-01T09:06:02Z",
+  "sealed_at": "2026-09-02T08:20:18Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -30,24 +30,24 @@
         {
           "id": "gpr_12m",
           "weight": 0.1,
-          "norm": 0.7284,
-          "contribution": 7.28,
-          "delta_contrib": 0.0
+          "norm": 0.7303,
+          "contribution": 7.3,
+          "delta_contrib": 0.02
         }
       ]
     },
     "tension": {
-      "value": 30.6,
+      "value": 26.5,
       "state": "Strain",
-      "delta": 0.0,
+      "delta": -4.1,
       "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty",
       "components": [
         {
           "id": "gpr_monthly",
           "weight": 0.55,
-          "norm": 0.2302,
-          "contribution": 12.66,
-          "delta_contrib": 0.0
+          "norm": 0.1559,
+          "contribution": 8.57,
+          "delta_contrib": -4.09
         },
         {
           "id": "gdelt",
@@ -68,19 +68,19 @@
   },
   "metrics": {
     "gpr_index": {
-      "value": 152.67,
-      "as_of": "2026-07",
+      "value": 117.92,
+      "as_of": "2026-08",
       "source": "Caldara & Iacoviello GPR",
       "stale": false
     },
     "gpr_index_12m_avg": {
-      "value": 172.01,
-      "as_of": "2026-07",
+      "value": 171.14,
+      "as_of": "2026-08",
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4426.0,
-      "as_of": "2026-09-01",
+      "value": 4375.3,
+      "as_of": "2026-09-02",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 5122.8,
+      "gold": 5064.1,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4107,
+      "value": 0.4121,
       "as_of": "2026-Q1",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.1163,
-      "vol_30d": 0.0041,
-      "as_of": "2026-08-31",
+      "rate": 16.1558,
+      "vol_30d": 0.0042,
+      "as_of": "2026-09-01",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -273,7 +273,7 @@
         "trend_30d": -0.055
       }
     ],
-    "as_of": "2026-09-01",
+    "as_of": "2026-09-02",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
