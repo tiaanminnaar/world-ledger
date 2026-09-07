@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-09-06T08:17:59Z",
+  "sealed_at": "2026-09-07T08:50:42Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -80,7 +80,7 @@
     },
     "gold_price_usd_oz": {
       "value": 4476.6,
-      "as_of": "2026-09-04",
+      "as_of": "2026-09-07",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -193,7 +193,7 @@
       "other": 0.333,
       "as_of": "2025",
       "source": "UN Comtrade (South Africa exports by partner, annual)",
-      "stale": false
+      "stale": true
     },
     "sarb": {
       "repo": 0.07,
@@ -273,7 +273,7 @@
         "trend_30d": -0.084
       }
     ],
-    "as_of": "2026-09-06",
+    "as_of": "2026-09-07",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
