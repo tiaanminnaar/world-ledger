@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-10-02T10:15:14Z",
+  "sealed_at": "2026-10-03T09:36:07Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -32,14 +32,14 @@
           "weight": 0.1,
           "norm": 0.7258,
           "contribution": 7.26,
-          "delta_contrib": -0.04
+          "delta_contrib": 0.0
         }
       ]
     },
     "tension": {
       "value": 29.2,
       "state": "Strain",
-      "delta": 3.3,
+      "delta": 0.0,
       "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty",
       "components": [
         {
@@ -47,7 +47,7 @@
           "weight": 0.55,
           "norm": 0.2164,
           "contribution": 11.9,
-          "delta_contrib": 3.33
+          "delta_contrib": 0.0
         },
         {
           "id": "gdelt",
@@ -79,7 +79,7 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4213.9,
+      "value": 4162.3,
       "as_of": "2026-10-02",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4877.3,
+      "gold": 4817.6,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4142,
+      "value": 0.4155,
       "as_of": "2026-Q2",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.5458,
-      "vol_30d": 0.0042,
-      "as_of": "2026-10-01",
+      "rate": 16.734,
+      "vol_30d": 0.0045,
+      "as_of": "2026-10-02",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -273,7 +273,7 @@
         "trend_30d": 0.086
       }
     ],
-    "as_of": "2026-10-02",
+    "as_of": "2026-10-03",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
