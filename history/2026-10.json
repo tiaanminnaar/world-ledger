@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-10-13T11:21:42Z",
+  "sealed_at": "2026-10-14T09:13:33Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -79,8 +79,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4210.5,
-      "as_of": "2026-10-13",
+      "value": 4166.4,
+      "as_of": "2026-10-14",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4873.3,
+      "gold": 4822.3,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4143,
+      "value": 0.4154,
       "as_of": "2026-Q2",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.541,
-      "vol_30d": 0.0056,
-      "as_of": "2026-10-12",
+      "rate": 16.4963,
+      "vol_30d": 0.0057,
+      "as_of": "2026-10-13",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -193,11 +193,11 @@
       "other": 0.2293,
       "as_of": "2025",
       "source": "UN Comtrade (South Africa exports by partner, annual)",
-      "stale": false
+      "stale": true
     },
     "sarb": {
       "repo": 0.0725,
-      "repo_as_of": "2026-10-13",
+      "repo_as_of": "2026-10-14",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
@@ -273,7 +273,7 @@
         "trend_30d": 0.07
       }
     ],
-    "as_of": "2026-10-13",
+    "as_of": "2026-10-14",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
