@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-10-24T08:34:35Z",
+  "sealed_at": "2026-10-25T08:53:43Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -37,9 +37,9 @@
       ]
     },
     "tension": {
-      "value": 29.6,
+      "value": 29.7,
       "state": "Strain",
-      "delta": 0.0,
+      "delta": 0.1,
       "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty",
       "components": [
         {
@@ -52,9 +52,9 @@
         {
           "id": "gdelt",
           "weight": 0.25,
-          "norm": 0.538,
-          "contribution": 13.45,
-          "delta_contrib": 0.0
+          "norm": 0.5429,
+          "contribution": 13.57,
+          "delta_contrib": 0.12
         },
         {
           "id": "cross_bloc_penalty",
@@ -100,7 +100,7 @@
       "value": 0.4197,
       "as_of": "2026-Q2",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
-      "stale": true
+      "stale": false
     },
     "cb_gold_tonnes_4q": {
       "value": 1043,
@@ -118,19 +118,19 @@
       "value": 0.567,
       "as_of": "2026-Q2",
       "source": "IMF COFER (allocated reserves, USD share)",
-      "stale": true
+      "stale": false
     },
     "cofer_allocated_total_usd_bn": {
       "value": 13216.8,
       "as_of": "2026-Q2",
       "source": "IMF COFER (allocated reserves, all currencies, nominal USD)",
-      "stale": true
+      "stale": false
     },
     "gdelt_conflict_tone_30d": {
-      "value": -2.304,
-      "as_of": "2026-10-23",
+      "value": -2.343,
+      "as_of": "2026-10-25",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
-      "stale": true
+      "stale": false
     }
   },
   "blocs": {
@@ -273,7 +273,7 @@
         "trend_30d": -0.062
       }
     ],
-    "as_of": "2026-10-24",
+    "as_of": "2026-10-25",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
