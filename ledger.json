@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-10-30T10:41:41Z",
+  "sealed_at": "2026-10-31T10:08:42Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -79,7 +79,7 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 3992.1,
+      "value": 3898.9,
       "as_of": "2026-10-30",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4620.6,
+      "gold": 4512.7,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4201,
+      "value": 0.4227,
       "as_of": "2026-Q2",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.6413,
-      "vol_30d": 0.0057,
-      "as_of": "2026-10-29",
+      "rate": 16.6895,
+      "vol_30d": 0.0056,
+      "as_of": "2026-10-30",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -193,7 +193,7 @@
       "other": 0.2293,
       "as_of": "2025",
       "source": "UN Comtrade (South Africa exports by partner, annual)",
-      "stale": true
+      "stale": false
     },
     "sarb": {
       "repo": 0.0725,
