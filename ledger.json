@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-10-31T10:08:42Z",
+  "sealed_at": "2026-11-01T10:58:57Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -193,7 +193,7 @@
       "other": 0.2293,
       "as_of": "2025",
       "source": "UN Comtrade (South Africa exports by partner, annual)",
-      "stale": false
+      "stale": true
     },
     "sarb": {
       "repo": 0.0725,
