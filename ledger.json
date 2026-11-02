@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-11-01T10:58:57Z",
+  "sealed_at": "2026-11-02T11:57:16Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -79,8 +79,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 3898.9,
-      "as_of": "2026-10-30",
+      "value": 3914.3,
+      "as_of": "2026-11-02",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4512.7,
+      "gold": 4530.5,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4227,
+      "value": 0.4223,
       "as_of": "2026-Q2",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -181,7 +181,7 @@
   "observer": {
     "usdzar": {
       "rate": 16.6895,
-      "vol_30d": 0.0056,
+      "vol_30d": 0.0057,
       "as_of": "2026-10-30",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
@@ -197,7 +197,7 @@
     },
     "sarb": {
       "repo": 0.0725,
-      "repo_as_of": "2026-10-30",
+      "repo_as_of": "2026-11-02",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
