@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-11-02T11:57:16Z",
+  "sealed_at": "2026-11-03T11:33:27Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -30,24 +30,24 @@
         {
           "id": "gpr_12m",
           "weight": 0.1,
-          "norm": 0.7258,
-          "contribution": 7.26,
-          "delta_contrib": 0.0
+          "norm": 0.7233,
+          "contribution": 7.23,
+          "delta_contrib": -0.03
         }
       ]
     },
     "tension": {
-      "value": 29.7,
+      "value": 30.2,
       "state": "Strain",
-      "delta": 0.0,
+      "delta": 0.5,
       "note": "weights: 0.55 GPR + 0.25 GDELT + 0.20 cross-bloc penalty",
       "components": [
         {
           "id": "gpr_monthly",
           "weight": 0.55,
-          "norm": 0.2164,
-          "contribution": 11.9,
-          "delta_contrib": 0.0
+          "norm": 0.2256,
+          "contribution": 12.41,
+          "delta_contrib": 0.51
         },
         {
           "id": "gdelt",
@@ -68,19 +68,19 @@
   },
   "metrics": {
     "gpr_index": {
-      "value": 146.21,
-      "as_of": "2026-09",
+      "value": 150.52,
+      "as_of": "2026-10",
       "source": "Caldara & Iacoviello GPR",
       "stale": false
     },
     "gpr_index_12m_avg": {
-      "value": 173.23,
-      "as_of": "2026-09",
+      "value": 174.43,
+      "as_of": "2026-10",
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 3914.3,
-      "as_of": "2026-11-02",
+      "value": 3913.6,
+      "as_of": "2026-11-03",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,7 +91,7 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4530.5,
+      "gold": 4529.7,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.6895,
+      "rate": 16.6386,
       "vol_30d": 0.0057,
-      "as_of": "2026-10-30",
+      "as_of": "2026-11-02",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -197,7 +197,7 @@
     },
     "sarb": {
       "repo": 0.0725,
-      "repo_as_of": "2026-11-02",
+      "repo_as_of": "2026-11-03",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
