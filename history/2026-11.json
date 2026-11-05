@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-11-04T11:48:39Z",
+  "sealed_at": "2026-11-05T11:47:23Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -52,9 +52,9 @@
         {
           "id": "gdelt",
           "weight": 0.25,
-          "norm": 0.5395,
-          "contribution": 13.49,
-          "delta_contrib": 0.0
+          "norm": 0.5404,
+          "contribution": 13.51,
+          "delta_contrib": 0.02
         },
         {
           "id": "cross_bloc_penalty",
@@ -79,8 +79,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 4053.8,
-      "as_of": "2026-11-04",
+      "value": 4145.1,
+      "as_of": "2026-11-05",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4692.0,
+      "gold": 4797.7,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4184,
+      "value": 0.416,
       "as_of": "2026-Q2",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -127,10 +127,10 @@
       "stale": false
     },
     "gdelt_conflict_tone_30d": {
-      "value": -2.316,
-      "as_of": "2026-10-27",
+      "value": -2.323,
+      "as_of": "2026-11-03",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
-      "stale": true
+      "stale": false
     }
   },
   "blocs": {
@@ -180,11 +180,11 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.6386,
-      "vol_30d": 0.0057,
-      "as_of": "2026-11-02",
+      "rate": 16.4555,
+      "vol_30d": 0.0058,
+      "as_of": "2026-11-04",
       "source": "frankfurter.app (ECB reference rates)",
-      "stale": true
+      "stale": false
     },
     "export_split": {
       "west": 0.392,
@@ -197,7 +197,7 @@
     },
     "sarb": {
       "repo": 0.0725,
-      "repo_as_of": "2026-11-03",
+      "repo_as_of": "2026-11-05",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
