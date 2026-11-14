@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-11-13T11:47:50Z",
+  "sealed_at": "2026-11-14T11:09:22Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -79,7 +79,7 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 3893.7,
+      "value": 3886.3,
       "as_of": "2026-11-13",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4506.7,
+      "gold": 4498.1,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4228,
+      "value": 0.423,
       "as_of": "2026-Q2",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -180,9 +180,9 @@
   ],
   "observer": {
     "usdzar": {
-      "rate": 16.715,
-      "vol_30d": 0.0053,
-      "as_of": "2026-11-12",
+      "rate": 16.9635,
+      "vol_30d": 0.0059,
+      "as_of": "2026-11-13",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
     },
@@ -221,61 +221,6 @@
     ]
   },
   "supply_lines": {
-    "chokepoints": [
-      {
-        "id": "panama",
-        "name": "Panama Canal",
-        "lat": 9.08,
-        "lon": -79.68,
-        "as_of": "2026-11-08",
-        "transits_7d": 27.3,
-        "vs_baseline": 0.853,
-        "trend_30d": 0.062
-      },
-      {
-        "id": "suez",
-        "name": "Suez Canal",
-        "lat": 30.5,
-        "lon": 32.35,
-        "as_of": "2026-11-08",
-        "transits_7d": 44.4,
-        "vs_baseline": 0.846,
-        "trend_30d": 0.036
-      },
-      {
-        "id": "bab_el_mandeb",
-        "name": "Bab el-Mandeb Strait",
-        "lat": 12.6,
-        "lon": 43.4,
-        "as_of": "2026-11-08",
-        "transits_7d": 26.3,
-        "vs_baseline": 0.492,
-        "trend_30d": -0.119
-      },
-      {
-        "id": "hormuz",
-        "name": "Strait of Hormuz",
-        "lat": 26.6,
-        "lon": 56.25,
-        "as_of": "2026-11-08",
-        "transits_7d": 3.9,
-        "vs_baseline": 0.056,
-        "trend_30d": -0.059
-      },
-      {
-        "id": "malacca",
-        "name": "Malacca Strait",
-        "lat": 2.5,
-        "lon": 101.4,
-        "as_of": "2026-11-08",
-        "transits_7d": 235.9,
-        "vs_baseline": 1.386,
-        "trend_30d": 0.013
-      }
-    ],
-    "as_of": "2026-11-13",
-    "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
-    "stale": false,
     "freight_wci_usd": {
       "value": 3120,
       "as_of": "2026-07-20",
