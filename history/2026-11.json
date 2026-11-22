@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-11-21T11:59:46Z",
+  "sealed_at": "2026-11-22T12:13:45Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -52,9 +52,9 @@
         {
           "id": "gdelt",
           "weight": 0.25,
-          "norm": 0.5056,
-          "contribution": 12.64,
-          "delta_contrib": 0.0
+          "norm": 0.5062,
+          "contribution": 12.66,
+          "delta_contrib": 0.02
         },
         {
           "id": "cross_bloc_penalty",
@@ -127,10 +127,10 @@
       "stale": false
     },
     "gdelt_conflict_tone_30d": {
-      "value": -2.045,
-      "as_of": "2026-11-20",
+      "value": -2.05,
+      "as_of": "2026-11-22",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
-      "stale": true
+      "stale": false
     }
   },
   "blocs": {
@@ -273,7 +273,7 @@
         "trend_30d": 0.053
       }
     ],
-    "as_of": "2026-11-21",
+    "as_of": "2026-11-22",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
