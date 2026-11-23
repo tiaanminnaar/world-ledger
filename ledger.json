@@ -1,5 +1,5 @@
 {
-  "sealed_at": "2026-11-22T12:13:45Z",
+  "sealed_at": "2026-11-23T13:58:41Z",
   "schema_version": 1,
   "composites": {
     "trust": {
@@ -52,9 +52,9 @@
         {
           "id": "gdelt",
           "weight": 0.25,
-          "norm": 0.5062,
-          "contribution": 12.66,
-          "delta_contrib": 0.02
+          "norm": 0.504,
+          "contribution": 12.6,
+          "delta_contrib": -0.06
         },
         {
           "id": "cross_bloc_penalty",
@@ -79,8 +79,8 @@
       "source": "Caldara & Iacoviello GPR"
     },
     "gold_price_usd_oz": {
-      "value": 3515.4,
-      "as_of": "2026-11-20",
+      "value": 3618.1,
+      "as_of": "2026-11-23",
       "source": "Yahoo Finance COMEX GC=F",
       "stale": false
     },
@@ -91,13 +91,13 @@
       "stale": false
     },
     "gold_vs_treasuries_usd_bn": {
-      "gold": 4068.8,
+      "gold": 4187.7,
       "treasuries": 7402.5,
       "as_of": "2023-01",
       "note": "gold = editorial 36000t x live price"
     },
     "dollar_share_gold_incl": {
-      "value": 0.4335,
+      "value": 0.4306,
       "as_of": "2026-Q2",
       "source": "IMF COFER (allocated dollar share + total) + editorial gold tonnage x live price",
       "stale": false
@@ -127,8 +127,8 @@
       "stale": false
     },
     "gdelt_conflict_tone_30d": {
-      "value": -2.05,
-      "as_of": "2026-11-22",
+      "value": -2.032,
+      "as_of": "2026-11-23",
       "source": "GDELT DOC 2.0 (30d avg tone, query: (sanctions OR tariff OR \"trade war\" OR geopolitical OR conflict))",
       "stale": false
     }
@@ -181,7 +181,7 @@
   "observer": {
     "usdzar": {
       "rate": 17.4692,
-      "vol_30d": 0.0065,
+      "vol_30d": 0.0066,
       "as_of": "2026-11-20",
       "source": "frankfurter.app (ECB reference rates)",
       "stale": false
@@ -197,7 +197,7 @@
     },
     "sarb": {
       "repo": 0.0725,
-      "repo_as_of": "2026-11-20",
+      "repo_as_of": "2026-11-23",
       "source": "SARB WebIndicators (CurrentMarketRates)",
       "stale": false,
       "reserves_usd_bn": 63.1,
@@ -273,7 +273,7 @@
         "trend_30d": 0.053
       }
     ],
-    "as_of": "2026-11-22",
+    "as_of": "2026-11-23",
     "source": "IMF PortWatch (daily chokepoint transits, ArcGIS feature service)",
     "stale": false,
     "freight_wci_usd": {
